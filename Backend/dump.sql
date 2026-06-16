@@ -10,8 +10,10 @@ create table usuarios(
     telefone bigint,
     email varchar(255),
     endereco varchar(255),
-    ativo int,
-    tipo_conta int
+    ativo int DEFAULT 1,
+
+    --  tipo_conta = 0 (CLIENTE) || tipo_conta = 0 (ADMIN)
+    tipo_conta int DEFAULT 0 
 );
 
 create table lanches (
@@ -20,7 +22,7 @@ create table lanches (
     preco decimal(8,2),
     categoria varchar(255),
     quantidade bigint,
-    disponivel boolean
+    disponivel boolean DEFAULT true
 );
 
 
