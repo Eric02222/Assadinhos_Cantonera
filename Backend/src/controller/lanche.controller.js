@@ -2,29 +2,29 @@ import db from "../config/db.js";
 
 const createLanche = async (req, res) => {
     try {
-        const { nome, preco, categoria, quantidade } = req.body
-        const [result] = []
+        const { nome, preco, categoria, quantidade } = req.body;
 
-        if (!nome || !preco || !categoria || !quantidade) {
-            return res.status(400).json({ message: "Todos os campos devem ser preenchidos", success: false })
-        }
-        if (quantidade === 0) {
-            const [result] = await db.query("INSERT INTO lanches (nome, preco, categoria, quantidade, disponivel) VALUES (?, ?, ?, ?, ?)", [nome, preco, categoria, quantidade, false])
-        } else if (quantidade > 0) {
-            const [result] = await db.query("INSERT INTO lanches (nome, preco, categoria, quantidade) VALUES (?, ?, ?, ?, ?)", [nome, preco, categoria, quantidade])
+        if (!nome || preco === undefined || !categoria || quantidade === undefined) {
+            return res.status(400).json({ message: "Todos os campos devem ser preenchidos", success: false });
         }
 
+        const disponivel = quantidade > 0;
+        
+        const [result] = await db.query(
+            "INSERT INTO lanches (nome, preco, categoria, quantidade, disponivel) VALUES (?, ?, ?, ?, ?)",
+            [nome, preco, categoria, quantidade, disponivel]
+        );
 
         if (result.affectedRows === 0) {
-            return res.status(400).json({ message: "Não foi possivel inserir o lanche", success: false })
+            return res.status(400).json({ message: "Não foi possível inserir o lanche", success: false });
         }
 
-        return res.status(201).json({ message: "Lanche cadastrado com sucesso", success: true })
+        return res.status(201).json({ message: "Lanche cadastrado com sucesso", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Erro ao criar lanche", error: error.message })
+        console.error("Erro ao criar lanche:", error);
+        return res.status(500).json({ message: "Erro ao criar lanche", error: error.message });
     }
 }
-
 
 const getLanche = async (req, res) => {
     try {
@@ -57,37 +57,30 @@ const editarLanche = async (req, res) => {
     try {
         const { id } = req.params;
         const { nome, preco, categoria, quantidade } = req.body;
-        const [result] = [];
 
         if (!id) {
             return res.status(400).json({ message: "O ID do lanche é obrigatório.", success: false });
         }
 
-        if (!nome || !preco || !categoria || !quantidade) {
+        if (!nome || preco === undefined || !categoria || quantidade === undefined) {
             return res.status(400).json({ message: "Informações do lanche são obrigatórios e não podem estar vazios.", success: false });
         }
 
-        if (quantidade === 0) {
-            const [result] = await db.query(
-                "UPDATE lanches SET nome = ?, preco = ?, categoria = ?, quantidade = ?, disponivel = false WHERE id = ?",
-                [nome, preco, categoria, quantidade, id]
-            );
-        } else if (quantidade > 0) {
-            const [result] = await db.query(
-                "UPDATE lanches SET nome = ?, preco = ?, categoria = ?, quantidade = ?, disponivel = true WHERE id = ?",
-                [nome, preco, categoria, quantidade, id]
-            );
-        }
+        const disponivel = quantidade > 0;
 
+        const [result] = await db.query(
+            "UPDATE lanches SET nome = ?, preco = ?, categoria = ?, quantidade = ?, disponivel = ? WHERE id = ?",
+            [nome, preco, categoria, quantidade, disponivel, id]
+        );
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Lanche não encontrado ou nenhuma alteração foi feita.", success: false });
         }
 
-        return res.status(200).json({ message: "Lanches atualizado com sucesso.", success: true });
+        return res.status(200).json({ message: "Lanche atualizado com sucesso.", success: true });
     } catch (error) {
-        console.error("Erro ao editar c:", error);
-        return res.status(500).json({ message: "Erro interno ao atualizar lanches.", error: error.message });
+        console.error("Erro ao editar lanche:", error);
+        return res.status(500).json({ message: "Erro interno ao atualizar lanche.", error: error.message });
     }
 }
 

@@ -1,12 +1,12 @@
-import React from 'react'
-import Main from '../../components/Main/Main'
+import React from 'react';
+import Main from '../../components/Main/Main';
 
 function Home() {
-  return (
-    <div>
-        <Main/>
-    </div>
-  )
+    return (
+        <div className="min-h-screen">
+            <Main />
+        </div>
+    );
 }
 
-export default Home
+export default Home;

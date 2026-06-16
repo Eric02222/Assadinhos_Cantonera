@@ -3,12 +3,12 @@ import { Outlet } from 'react-router'
 
 function Layout() {
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
         <Navbar/>
 
-        <section>
+        <main className="pb-20">
             <Outlet/>
-        </section>
+        </main>
     </div>
   )
 }

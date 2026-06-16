@@ -5,7 +5,8 @@ export async function cadastrarUser(data) {
         const res = await api.post('/cadastrar', data)
         return res.data
     } catch (error) {
-        console.log('Erro ao logar', error)
+        console.error('Erro ao cadastrar', error)
+        throw error
     }
 }
 
@@ -15,7 +16,8 @@ export async function loginUserEmail(data) {
         const res = await api.post('/login/email', data)
         return res.data
     } catch (error) {
-        console.log('Erro ao logar', error)
+        console.error('Erro ao logar com email', error)
+        throw error
     }
 }
 
@@ -24,10 +26,7 @@ export async function loginUserCpf(data) {
         const res = await api.post('/login/cpf', data)
         return res.data
     } catch (error) {
-        console.log('Erro ao logar', error)
+        console.error('Erro ao logar com CPF', error)
+        throw error
     }
 }
-
-
-
-

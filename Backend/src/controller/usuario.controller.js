@@ -12,15 +12,19 @@ const createUser = async (req, res) => {
         const saltRound = 10;
         const hashPassword = await bcrypt.hash(senha, saltRound)
 
-        const [result] = await db.query("INSERT INTO usuarios (nome, email, senha, cpf, telefone, endereco, tipo_conta) VALUES (?, ?, ?, ?, ?)", [nome, email, hashPassword, cpf, telefone, endereco, tipo_conta])
+        const [result] = await db.query(
+            "INSERT INTO usuarios (nome, email, senha, cpf, telefone, endereco, tipo_conta) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+            [nome, email, hashPassword, cpf, telefone, endereco, tipo_conta || 0]
+        )
 
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Não foi possivel inserir o usuario", success: false })
         }
 
-        return res.status(201).json({ message: "Usuarios cadastrado com sucesso", success: true })
+        return res.status(201).json({ message: "Usuário cadastrado com sucesso", success: true })
     } catch (error) {
-        return res.status(500).json({ message: "Erro ao criar usuarios", error: error.message })
+        console.error("Erro ao criar usuário:", error);
+        return res.status(500).json({ message: "Erro ao criar usuário", error: error.message })
     }
 }
 
@@ -41,13 +45,13 @@ const getUsuarioById = async (req, res) => {
         const [rows] = await db.query("SELECT * FROM usuarios WHERE id = ?", [id]);
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: "Usuarios não encontrado", success: false });
+            return res.status(404).json({ message: "Usuário não encontrado", success: false });
         }
 
         return res.status(200).json({ success: true, data: rows[0] });
     } catch (error) {
-        console.error("Erro ao buscar usuarios:", error);
-        return res.status(500).json({ message: "Erro ao buscar usuarios", error: error.message });
+        console.error("Erro ao buscar usuário:", error);
+        return res.status(500).json({ message: "Erro ao buscar usuário", error: error.message });
     }
 }
 
@@ -57,34 +61,43 @@ const getUsuarioByEmail = async (req, res) => {
         const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
 
         if (rows.length === 0) {
-            console.log(email)
-            return res.status(404).json({ message: "Usuarios não encontrado", success: false });
+            return res.status(404).json({ message: "Usuário não encontrado", success: false });
         }
 
         return res.status(200).json({ success: true, data: rows[0] });
     } catch (error) {
-        console.error("Erro ao buscar usuarios:", error);
-        return res.status(500).json({ message: "Erro ao buscar usuarios", error: error.message });
+        console.error("Erro ao buscar usuário:", error);
+        return res.status(500).json({ message: "Erro ao buscar usuário", error: error.message });
     }
 }
 
 const editarUsuario = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, email, cpf, telefone, endereco, senha} = req.body;
+        const { nome, email, cpf, telefone, endereco, senha } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: "O ID do usuário é obrigatório.", success: false });
         }
 
-        if (!nome || !email || nome === "" || email === "") {
-            return res.status(400).json({ message: "Nome e email são obrigatórios e não podem estar vazios.", success: false });
+        if (!nome || !email) {
+            return res.status(400).json({ message: "Nome e email são obrigatórios.", success: false });
         }
 
-        const [result] = await db.query(
-            "UPDATE usuarios SET nome = ?, email = ?, cpf = ?, telefone = ?, endereco = ?, senha = ? WHERE id = ?",
-            [nome, email, cpf, telefone, endereco, senha, id]
-        );
+        let query = "UPDATE usuarios SET nome = ?, email = ?, cpf = ?, telefone = ?, endereco = ?";
+        let params = [nome, email, cpf, telefone, endereco];
+
+        if (senha) {
+            const saltRound = 10;
+            const hashPassword = await bcrypt.hash(senha, saltRound);
+            query += ", senha = ?";
+            params.push(hashPassword);
+        }
+
+        query += " WHERE id = ?";
+        params.push(id);
+
+        const [result] = await db.query(query, params);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Usuário não encontrado ou nenhuma alteração foi feita.", success: false });
@@ -92,7 +105,7 @@ const editarUsuario = async (req, res) => {
 
         return res.status(200).json({ message: "Usuário atualizado com sucesso.", success: true });
     } catch (error) {
-        console.error("Erro ao editar c:", error);
+        console.error("Erro ao editar usuário:", error);
         return res.status(500).json({ message: "Erro interno ao atualizar usuário.", error: error.message });
     }
 }
@@ -102,20 +115,20 @@ const excluirUsuario = async (req, res) => {
         const { id } = req.params;
 
         if (!id) {
-            return res.status(400).json({ message: "O ID do usuarios é obrigatório.", success: false });
+            return res.status(400).json({ message: "O ID do usuário é obrigatório.", success: false });
         }
 
         const [result] = await db.query("DELETE FROM usuarios WHERE id = ?", [id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Usuários não encontrado.", success: false });
+            return res.status(404).json({ message: "Usuário não encontrado.", success: false });
         }
 
-        return res.status(200).json({ message: "Usuários excluído com sucesso.", success: true });
+        return res.status(200).json({ message: "Usuário excluído com sucesso.", success: true });
     } catch (error) {
-        console.error("Erro ao excluir usuários:", error);
-        return res.status(500).json({ message: "Erro interno ao excluir usuários.", error: error.message });
+        console.error("Erro ao excluir usuário:", error);
+        return res.status(500).json({ message: "Erro interno ao excluir usuário.", error: error.message });
     }
 }
 
-export { createUser, getUsuarios, getUsuarioById ,getUsuarioByEmail ,editarUsuario, excluirUsuario };
+export { createUser, getUsuarios, getUsuarioById, getUsuarioByEmail, editarUsuario, excluirUsuario };

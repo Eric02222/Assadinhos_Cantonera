@@ -3,6 +3,8 @@ import cors from "cors";
 import { routerAuth } from "./route/authRouter.js";
 import routerUsuario from "./route/usuarioRouter.js";
 import routerLanche from "./route/lancheRouter.js";
+import routerPedido from "./route/pedidoRouter.js";
+import routerHistorico from "./route/historicoRouter.js";
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.get("/", (req, res) => {
 app.use(routerAuth);
 app.use(routerUsuario);
 app.use(routerLanche);
+app.use(routerPedido);
+app.use(routerHistorico);
 
 
 

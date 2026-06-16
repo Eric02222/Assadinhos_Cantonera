@@ -5,30 +5,48 @@ function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="navbar navbar-expand navbar-dark px-4 py-2" >
-      <div className="container-fluid">
-        <h1 className="navbar mb-0 fs-3 fw-bold">Assadinhos de Cantonera</h1>
+    <nav className="bg-white border-b border-gray-100 sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          <div className="flex items-center">
+            <Link to="/" className="text-2xl font-black text-red-500 tracking-tighter">
+              ASSADINHOS <span className="text-gray-800">CANTONERA</span>
+            </Link>
+          </div>
 
-        <div className="d-flex align-items-end gap-3">
-          <Link to="/" className="btn btn-outline px-3">Home</Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link to="/" className="text-gray-600 font-semibold hover:text-red-500 transition-colors">Home</Link>
+            
+            {user ? (
+              <div className="flex items-center gap-6">
+                <Link to="/historico" className="text-gray-600 font-semibold hover:text-red-500 transition-colors">Histórico</Link>
+                <Link to="/pedidos" className="text-gray-600 font-semibold hover:text-red-500 transition-colors">Pedidos</Link>
+                <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
+                  <span className="text-sm font-medium text-gray-500">Olá, <span className="text-gray-800 font-bold">{user.nome}</span></span>
+                  <button 
+                    onClick={logout} 
+                    className="bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 px-5 py-2 rounded-xl text-sm font-bold transition-all"
+                  >
+                    Sair
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link to="/login" className="text-gray-600 font-semibold hover:text-red-500 transition-colors px-4">Login</Link>
+                <Link 
+                  to="/cadastro" 
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-red-200 transition-all"
+                >
+                  Criar Conta
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
-
-        {user ? (
-          <nav className="d-flex align-items-center gap-3">
-            <Link to="/historico" className="btn btn-outline px-3">Historico</Link>
-            <Link to="/pedidos" className="btn btn-outline px-3">Pedidos</Link>
-            <Link to="/" className="btn btn-outline px-3">Home</Link>
-            <button onClick={logout} className="btn btn-danger btn-sm px-3 shadow-sm fw-bold">Logout</button>
-          </nav>
-        ) : (
-          <nav className="d-flex gap-2">
-            <Link to="/login" className="btn btn-outline px-3">Login</Link>
-            <Link to="/cadastro" className="btn btn-light px-3 fw-medium text-primary shadow-sm">Cadastro</Link>
-          </nav>
-        )}
       </div>
     </nav>
   )
 }
 
-export default Navbar
+export default Navbar;

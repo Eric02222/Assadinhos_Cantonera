@@ -1,95 +1,90 @@
-🍔 Assadinhos da Cantonera
-Uma plataforma moderna e intuitiva para venda de lanches, desenvolvida com o objetivo de facilitar a experiência de compra do público, conectando clientes aos melhores sabores de forma rápida e prática.
+# 🍔 Assadinhos Cantonera — Sistema de Gestão e Vendas de Lanches
 
-🚀 Tecnologias Utilizadas
-O projeto está dividido em duas partes principais: Frontend (Interface do Usuário) e Backend (API e Banco de Dados).
+Bem-vindo ao **Assadinhos Cantonera**, uma aplicação Full-Stack desenvolvida para oferecer uma experiência de compra moderna, intuitiva e eficiente. O sistema conecta clientes a um cardápio variado de lanches, permitindo desde a escolha e pedido em tempo real até a gestão administrativa completa do estoque e produtos.
 
-Frontend
-React (v19): Biblioteca principal para a construção da interface.
+---
 
-Vite: Ferramenta de build super rápida.
+## 🌟 Diferenciais do Projeto
 
-Tailwind CSS (v4): Estilização utilitária para um design responsivo e moderno.
+### 🛍️ Experiência do Cliente
+- **Interface Intuitiva**: Design moderno desenvolvido com Tailwind CSS v4, focado em facilidade de uso e responsividade.
+- **Cardápio Dinâmico**: Visualização de lanches por categorias (Fritos, Assados, Bebidas, Doces) com sistema de busca em tempo real.
+- **Gestão de Pedidos**: Fluxo de compra simplificado com modal de confirmação, cálculo automático de valor total e validação de estoque.
+- **Autenticação Flexível**: Possibilidade de login via E-mail ou CPF, com persistência de sessão e proteção de rotas.
 
-React Router: Gerenciamento de rotas e navegação.
+### 🛡️ Gestão Administrativa (Painel do Admin)
+- **Dashboard de Produtos**: Controle total (CRUD) sobre o cardápio diretamente pela interface.
+- **Lógica de Inventário Inteligente**: 
+    - Subtração automática de estoque ao realizar vendas.
+    - Atualização automática de disponibilidade (o sistema desabilita o produto quando a quantidade atinge zero).
+    - Bloqueio de pedidos que excedam o limite físico disponível.
+- **Segurança**: Criptografia de senhas com `bcrypt` e níveis de acesso distintos entre cliente e administrador.
 
-Axios: Cliente HTTP para comunicação com a API.
+---
 
-React Toastify: Notificações amigáveis e elegantes para o usuário.
+## 🛠️ Stack Tecnológica
 
-Backend
-Node.js & Express (v5): Estrutura e rotas da API.
+### **Frontend**
+- **React 19**: Construção de componentes funcionais e hooks modernos.
+- **Tailwind CSS v4**: Estilização de alta performance com design utilitário.
+- **React Router 7**: Gerenciamento de navegação e layouts.
+- **Context API**: Gerenciamento global de estado para autenticação.
+- **Axios & React Toastify**: Comunicação com a API e sistema de notificações elegantes.
 
-MySQL2: Conexão e integração com o banco de dados relacional.
+### **Backend**
+- **Node.js & Express 5**: Arquitetura robusta e escalável para a API.
+- **MySQL**: Banco de dados relacional para armazenamento seguro e consistente.
+- **Bcrypt**: Garantia de privacidade e segurança nas credenciais dos usuários.
 
-Bcrypt: Criptografia de senhas para garantir a segurança dos usuários.
+---
 
-Dotenv: Gerenciamento de variáveis de ambiente.
+## 🚀 Como Executar o Projeto
 
-CORS: Controle de acesso HTTP.
+### 1. Preparação do Banco de Dados
+O projeto utiliza um arquivo `dump.sql` localizado na pasta `Backend` para inicializar a estrutura.
+- Importe o arquivo `Backend/dump.sql` no seu servidor MySQL.
+- O banco contém usuários de teste pré-configurados (hashes bcrypt inclusos):
+    - **Admin**: `admin@gmail.com` | Senha: `admin`
+    - **Cliente**: `a@gmail.com` | Senha: `banana`
 
-📋 Pré-requisitos
-Antes de começar, você precisará ter as seguintes ferramentas instaladas na sua máquina:
-
-Node.js (Versão recomendada: 18+ ou 20+)
-
-MySQL (Servidor de banco de dados rodando)
-
-Git (Para clonar o repositório)
-
-🔧 Como instalar e rodar o projeto
-1. Clonando o repositório
-Bash
-git clone https://github.com/seu-usuario/assadinhos-da-cantonera.git
-cd assadinhos-da-cantonera
-2. Configurando o Backend (API)
-Navegue até a pasta do backend, instale as dependências e configure o ambiente:
-
-Bash
-cd backend
+### 2. Configuração do Backend
+```bash
+cd Backend
 npm install
-Crie um arquivo .env na raiz da pasta backend com as seguintes variáveis de configuração do seu banco de dados:
-
-Snippet de código
-PORT=3000
+```
+Configure as variáveis de ambiente no arquivo `.env` (exemplo baseado no `db.js` e `env.js` existentes):
+```env
 DB_HOST=localhost
-DB_USER=seu_usuario_mysql
-DB_PASSWORD=sua_senha_mysql
-DB_NAME=assadinhos_db
-Inicie o servidor de desenvolvimento (utiliza nodemon para reinicialização automática):
-
-Bash
+DB_USER=root
+DB_PASSWORD=senai
+DB_DATABASE=lanchos
+PORT=8081
+```
+Inicie o servidor:
+```bash
 npm start
-O backend estará rodando em http://localhost:3000.
+```
 
-3. Configurando o Frontend
-Abra um novo terminal, navegue até a pasta do frontend e instale as dependências:
-
-Bash
-cd frontend
+### 3. Configuração do Frontend
+```bash
+cd Frontend
 npm install
-Inicie o servidor de desenvolvimento do Vite:
-
-Bash
 npm run dev
-O frontend estará rodando e acessível no seu navegador, geralmente em http://localhost:5173.
+```
+Acesse a aplicação em `http://localhost:5173`.
 
-📦 Scripts Disponíveis
-Frontend (/frontend)
-npm run dev: Inicia o servidor de desenvolvimento.
+---
 
-Backend (/backend)
-npm start: Inicia o servidor de desenvolvimento utilizando o Nodemon (reinicia automaticamente ao salvar arquivos).
+## 📂 Estrutura de Pastas (Resumo)
+- `Backend/src/controller`: Lógica de negócios (Pedidos, Lanches, Usuários, Auth).
+- `Backend/src/route`: Definição dos endpoints da API.
+- `Frontend/src/components`: Componentes reutilizáveis (Modal, Navbar, Forms).
+- `Frontend/src/context`: Gerenciamento de estado de autenticação.
+- `Frontend/src/services`: Camada de comunicação com a API (Axios).
+- `Frontend/src/pages`: Telas principais da aplicação.
 
-🤝 Contribuição
-Sinta-se à vontade para contribuir com o projeto! Para isso:
+---
 
-Faça um Fork do projeto
+## 🤝 Contribuição
+Contribuições são sempre bem-vindas! Sinta-se à vontade para abrir uma *Issue* ou enviar um *Pull Request* para melhorias no sistema.
 
-Crie uma branch para sua feature (git checkout -b feature/NovaFeature)
-
-Faça o commit das suas alterações (git commit -m 'Adicionando uma nova feature')
-
-Faça o push para a branch (git push origin feature/NovaFeature)
-
-Abra um Pull Request

@@ -12,7 +12,7 @@ create table usuarios(
     endereco varchar(255),
     ativo int DEFAULT 1,
 
-    --  tipo_conta = 0 (CLIENTE) || tipo_conta = 0 (ADMIN)
+    --  tipo_conta = 0 (CLIENTE) || tipo_conta = 1 (ADMIN)
     tipo_conta int DEFAULT 0 
 );
 
@@ -50,9 +50,9 @@ create table historico(
 
 insert into usuarios (nome,cpf,senha,telefone,email,endereco,ativo,tipo_conta)
 values
-("andrei", 12371471713, "banana", 48918276917, "a@gmail.com", "rua das bananas 69", 1 , 0),
-("felipe", 17420817287, "laranja", 12912376178, "b@gmail.com", "rua das vacas 420", 1 , 0),
-("admin", 00000000000, "admin", 00000000000, "admin@gmail.com", "endereco da loja", 1 , 1);
+("andrei", 12371471713, "$2b$10$vu3/3XZ7Im//WL269b3kYuFStDUU7byZlMKBSgyW.PILMTs.HRHs6", 48918276917, "a@gmail.com", "rua das bananas 69", 1 , 0),
+("felipe", 17420817287, "$2b$10$X.uJP.9cxTAHFjOVSP8C8.sEKWP38R56BUBLuyXqrILmKnIr4qIhG", 12912376178, "b@gmail.com", "rua das vacas 420", 1 , 0),
+("admin", 00000000000, "$2b$10$5S/rTz1LhkSiN1Xi5kc2/ufIJEV5OgZYmrGhaZGC0.E3kp2sy9/OG", 00000000000, "admin@gmail.com", "endereco da loja", 1 , 1);
 
 insert into lanches (nome,preco,categoria,quantidade,disponivel)
 values
