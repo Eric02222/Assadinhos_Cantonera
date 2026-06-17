@@ -49,3 +49,13 @@ export async function deletePedido(id) {
         throw error;
     }
 }
+
+export async function confirmarEntrega(id) {
+    try {
+        const res = await api.post(`/pedido/confirmar/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error('Erro ao confirmar entrega', error);
+        throw error;
+    }
+}

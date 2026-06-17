@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getLanches, createLanche, updateLanche, deleteLanche } from '../../services/lanche';
-import { createPedido } from '../../services/pedido';
 import { useAuth } from '../../context/Context';
 import Modal from '../Modal/Modal';
 import { toast } from 'react-toastify';
@@ -14,7 +13,7 @@ function Main() {
     const [selectedLanche, setSelectedLanche] = useState(null);
     const [quantidade, setQuantidade] = useState(1);
     const [loading, setLoading] = useState(true);
-    const { user } = useAuth();
+    const { user, addToCart } = useAuth();
 
     // Estados para o Admin
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
@@ -67,32 +66,16 @@ function Main() {
     };
 
     // Lógica do Pedido (Cliente)
-    const handleOrder = async () => {
+    const handleAddToCart = () => {
         if (!user) {
-            toast.warning('Você precisa estar logado para fazer um pedido.');
+            toast.warning('Você precisa estar logado para adicionar ao carrinho.');
             return;
         }
 
-        try {
-            const pedidoData = {
-                lanchePedido: selectedLanche.id,
-                quantidadePedida: quantidade,
-                enderecoPedido: user.endereco || 'Endereço não informado',
-                usuarioComprador: user.id
-            };
-
-            const res = await createPedido(pedidoData);
-            if (res.success) {
-                toast.success('Pedido realizado com sucesso!');
-                setSelectedLanche(null);
-                setQuantidade(1);
-                fetchLanches(); 
-            } else {
-                toast.error(res.message);
-            }
-        } catch (err) {
-            toast.error('Erro ao realizar pedido.');
-        }
+        addToCart(selectedLanche, quantidade);
+        toast.success(`${selectedLanche.nome} adicionado ao carrinho!`);
+        setSelectedLanche(null);
+        setQuantidade(1);
     };
 
     // Lógica do Admin (CRUD)
@@ -264,9 +247,9 @@ function Main() {
             <Modal 
                 isOpen={!!selectedLanche} 
                 onClose={() => { setSelectedLanche(null); setQuantidade(1); }}
-                onConfirm={handleOrder}
-                title="Finalizar Pedido"
-                confirmText="Confirmar Pedido"
+                onConfirm={handleAddToCart}
+                title="Adicionar ao Carrinho"
+                confirmText="Adicionar ao Carrinho"
             >
                 {selectedLanche && (
                     <>

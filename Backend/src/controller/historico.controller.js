@@ -2,15 +2,15 @@ import db from "../config/db.js";
 
 const createHistorico = async (req, res) => {
     try {
-        const { lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, horarioPedido } = req.body;
+        const { lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, horarioPedido, acao } = req.body;
 
         if (!lanchePedido || !quantidadePedida || !enderecoPedido || !usuarioComprador) {
             return res.status(400).json({ message: "Todos os campos devem ser preenchidos", success: false });
         }
 
         const [result] = await db.query(
-            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador) VALUES (?, ?, ?, ?, ?)",
-            [horarioPedido || new Date(), lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador]
+            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (?, ?, ?, ?, ?, ?)",
+            [horarioPedido || new Date(), lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao || 'Pedido']
         );
 
         if (result.affectedRows === 0) {

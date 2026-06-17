@@ -37,6 +37,12 @@ const createPedido = async (req, res) => {
             return res.status(400).json({ message: "Não foi possível realizar o pedido", success: false });
         }
 
+        // Log no histórico
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
+            [lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, 'Pedido']
+        );
+
         return res.status(201).json({ message: "Pedido realizado com sucesso", success: true });
     } catch (error) {
         console.error("Erro ao criar pedido:", error);
@@ -130,6 +136,12 @@ const editarPedido = async (req, res) => {
             return res.status(404).json({ message: "Pedido não encontrado ou nenhuma alteração foi feita.", success: false });
         }
 
+        // Log no histórico
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
+            [lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, 'Edição']
+        );
+
         return res.status(200).json({ message: "Pedido atualizado com sucesso.", success: true });
     } catch (error) {
         console.error("Erro ao editar pedido:", error);
@@ -145,11 +157,24 @@ const excluirPedido = async (req, res) => {
             return res.status(400).json({ message: "O ID do pedido é obrigatório.", success: false });
         }
 
+        // Busca dados do pedido antes de excluir para o histórico
+        const [pedidoRows] = await db.query("SELECT * FROM pedidos WHERE id = ?", [id]);
+        if (pedidoRows.length === 0) {
+            return res.status(404).json({ message: "Pedido não encontrado.", success: false });
+        }
+        const pedido = pedidoRows[0];
+
         const [result] = await db.query("DELETE FROM pedidos WHERE id = ?", [id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Pedido não encontrado.", success: false });
         }
+
+        // Log no histórico
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
+            [pedido.lanchePedido, pedido.quantidadePedida, pedido.enderecoPedido, pedido.usuarioComprador, 'Cancelamento/Exclusão']
+        );
 
         return res.status(200).json({ message: "Pedido excluído com sucesso.", success: true });
     } catch (error) {
@@ -158,4 +183,38 @@ const excluirPedido = async (req, res) => {
     }
 };
 
-export { createPedido, getPedidos, getPedidoById, editarPedido, excluirPedido };
+const confirmarEntrega = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ message: "O ID do pedido é obrigatório.", success: false });
+        }
+
+        // Busca dados do pedido antes de excluir para o histórico
+        const [pedidoRows] = await db.query("SELECT * FROM pedidos WHERE id = ?", [id]);
+        if (pedidoRows.length === 0) {
+            return res.status(404).json({ message: "Pedido não encontrado.", success: false });
+        }
+        const pedido = pedidoRows[0];
+
+        const [result] = await db.query("DELETE FROM pedidos WHERE id = ?", [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Pedido não encontrado.", success: false });
+        }
+
+        // Log no histórico
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
+            [pedido.lanchePedido, pedido.quantidadePedida, pedido.enderecoPedido, pedido.usuarioComprador, 'Entrega Realizada']
+        );
+
+        return res.status(200).json({ message: "Entrega confirmada com sucesso.", success: true });
+    } catch (error) {
+        console.error("Erro ao confirmar entrega:", error);
+        return res.status(500).json({ message: "Erro interno ao confirmar entrega.", error: error.message });
+    }
+};
+
+export { createPedido, getPedidos, getPedidoById, editarPedido, excluirPedido, confirmarEntrega };

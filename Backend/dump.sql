@@ -44,6 +44,7 @@ create table historico(
     quantidadePedida bigint,
     enderecoPedido varchar(255),
     usuarioComprador int,
+    acao varchar(50),
     foreign key (lanchePedido) references lanches(id),
     foreign key (usuarioComprador) references usuarios(id)
 );
@@ -66,8 +67,8 @@ values
 ('2026-06-15 14:40:00', 2, 10,"rua das bananas 69", 1),
 ('2026-06-15 14:55:00', 2, 1,"rua das vacas 420", 2);
 
-insert into historico ( horarioPedido,lanchePedido,quantidadePedida,enderecoPedido,usuarioComprador)
+insert into historico ( horarioPedido,lanchePedido,quantidadePedida,enderecoPedido,usuarioComprador, acao)
 values
-('2026-04-26 12:30:00', 2, 12,"rua das bananas 69", 1),
-('2026-01-12 16:55:00', 1, 15,"rua das bananas 69", 1),
-('2026-03-11 09:32:00', 2, 3,"rua das vacas 420", 2);
+('2026-04-26 12:30:00', 2, 12,"rua das bananas 69", 1, 'Pedido'),
+('2026-01-12 16:55:00', 1, 15,"rua das bananas 69", 1, 'Pedido'),
+('2026-03-11 09:32:00', 2, 3,"rua das vacas 420", 2, 'Pedido');

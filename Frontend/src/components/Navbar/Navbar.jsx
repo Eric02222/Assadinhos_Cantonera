@@ -1,8 +1,13 @@
 import { Link } from "react-router";
 import { useAuth } from "../../context/Context";
+import { useState } from "react";
+import CartModal from "../Cart/CartModal";
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, cart } = useAuth();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const cartItemsCount = cart.reduce((acc, item) => acc + item.quantidadeNoCarrinho, 0);
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-40">
@@ -21,6 +26,20 @@ function Navbar() {
               <div className="flex items-center gap-6">
                 <Link to="/historico" className="text-gray-600 font-semibold hover:text-red-500 transition-colors">Histórico</Link>
                 <Link to="/pedidos" className="text-gray-600 font-semibold hover:text-red-500 transition-colors">Pedidos</Link>
+                
+                {/* Botão do Carrinho */}
+                <button 
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2 text-gray-600 hover:text-red-500 transition-colors"
+                >
+                  <span className="text-2xl">🛒</span>
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </button>
+
                 <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
                   <span className="text-sm font-medium text-gray-500">Olá, <span className="text-gray-800 font-bold">{user.nome}</span></span>
                   <button 
@@ -45,6 +64,8 @@ function Navbar() {
           </div>
         </div>
       </div>
+
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   )
 }

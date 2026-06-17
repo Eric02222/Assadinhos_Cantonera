@@ -4,10 +4,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    const carregarUsuarioArmazenado = () => {
+    const carregarDadosArmazenados = () => {
       const storedUser = localStorage.getItem("user");
+      const storedCart = localStorage.getItem("cart");
 
       if (storedUser) {
         try {
@@ -18,8 +20,17 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("user");
         }
       }
+
+      if (storedCart) {
+        try {
+          setCart(JSON.parse(storedCart));
+        } catch (error) {
+          console.error("Erro ao ler dados do carrinho:", error);
+          localStorage.removeItem("cart");
+        }
+      }
     };
-    carregarUsuarioArmazenado();
+    carregarDadosArmazenados();
   }, []);
 
   const login = (userData) => {
@@ -33,8 +44,58 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const addToCart = (lanche, quantidade) => {
+    setCart((prevCart) => {
+      const existingItemIndex = prevCart.findIndex((item) => item.id === lanche.id);
+      let newCart;
+
+      if (existingItemIndex > -1) {
+        newCart = [...prevCart];
+        newCart[existingItemIndex].quantidadeNoCarrinho += quantidade;
+      } else {
+        newCart = [...prevCart, { ...lanche, quantidadeNoCarrinho: quantidade }];
+      }
+
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return newCart;
+    });
+  };
+
+  const removeFromCart = (lancheId) => {
+    setCart((prevCart) => {
+      const newCart = prevCart.filter((item) => item.id !== lancheId);
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return newCart;
+    });
+  };
+
+  const updateCartQuantity = (lancheId, quantidade) => {
+    setCart((prevCart) => {
+      const newCart = prevCart.map((item) =>
+        item.id === lancheId ? { ...item, quantidadeNoCarrinho: quantidade } : item
+      );
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return newCart;
+    });
+  };
+
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      setUser, 
+      login, 
+      logout, 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      updateCartQuantity, 
+      clearCart 
+    }}>
       {children}
     </AuthContext.Provider>
   );
