@@ -15,6 +15,8 @@ function ListaPedidos() {
         enderecoPedido: '',
         usuarioComprador: ''
     });
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [pedidoToCancel, setPedidoToCancel] = useState(null);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -25,8 +27,7 @@ function ListaPedidos() {
         try {
             const data = await getPedidos();
             if (data.success) {
-                // Se for admin (tipo_conta === 1), vê todos. 
-                // Se for cliente, vê apenas os seus.
+
                 if (user?.tipo_conta === 1) {
                     setPedidos(data.data);
                 } else {
@@ -72,19 +73,26 @@ function ListaPedidos() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Tem certeza que deseja cancelar este pedido?')) {
-            try {
-                const res = await deletePedido(id);
-                if (res.success) {
-                    toast.success('Pedido cancelado com sucesso!');
-                    fetchPedidos();
-                } else {
-                    toast.error(res.message || 'Erro ao cancelar pedido.');
-                }
-            } catch (err) {
-                toast.error('Erro ao excluir pedido.');
+    const handleDelete = (pedido) => {
+        setPedidoToCancel(pedido);
+        setIsCancelModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!pedidoToCancel) return;
+        try {
+            const res = await deletePedido(pedidoToCancel.id);
+            if (res.success) {
+                toast.success('Pedido cancelado com sucesso!');
+                fetchPedidos();
+            } else {
+                toast.error(res.message || 'Erro ao cancelar pedido.');
             }
+        } catch (err) {
+            toast.error('Erro ao excluir pedido.');
+        } finally {
+            setIsCancelModalOpen(false);
+            setPedidoToCancel(null);
         }
     };
 
@@ -166,7 +174,7 @@ function ListaPedidos() {
                                                 Editar
                                             </button>
                                             <button 
-                                                onClick={() => handleDelete(pedido.id)}
+                                                onClick={() => handleDelete(pedido)}
                                                 className="text-red-500 hover:text-red-700 font-bold text-sm transition-colors"
                                             >
                                                 Cancelar
@@ -217,6 +225,23 @@ function ListaPedidos() {
                         />
                     </div>
                 </div>
+            </Modal>
+
+            {/* Modal de Confirmação de Cancelamento */}
+            <Modal
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Confirmar Cancelamento"
+                confirmText="Sim, Cancelar Pedido"
+                cancelText="Não"
+            >
+                {pedidoToCancel && (
+                    <p className="text-gray-600">
+                        Tem certeza que deseja cancelar o pedido <span className="font-bold">#{pedidoToCancel.id}</span>
+                        (<span className="font-bold">{pedidoToCancel.lancheNome}</span>)?
+                    </p>
+                )}
             </Modal>
         </div>
     );

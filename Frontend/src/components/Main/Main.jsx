@@ -13,9 +13,8 @@ function Main() {
     const [selectedLanche, setSelectedLanche] = useState(null);
     const [quantidade, setQuantidade] = useState(1);
     const [loading, setLoading] = useState(true);
-    const { user, addToCart } = useAuth();
+    const { user, addToCart, lastOrderTime } = useAuth();
 
-    // Estados para o Admin
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
     const [editingLanche, setEditingLanche] = useState(null);
     const [adminFormData, setAdminFormData] = useState({
@@ -25,9 +24,12 @@ function Main() {
         quantidade: ''
     });
 
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [lancheToDelete, setLancheToDelete] = useState(null);
+
     useEffect(() => {
         fetchLanches();
-    }, []);
+    }, [lastOrderTime]); 
 
     useEffect(() => {
         filterLanches();
@@ -107,11 +109,12 @@ function Main() {
         }
 
         try {
+            const dataToSend = { ...adminFormData, userId: user.id };
             if (editingLanche) {
-                await updateLanche(editingLanche.id, adminFormData);
+                await updateLanche(editingLanche.id, dataToSend);
                 toast.success('Lanche atualizado com sucesso!');
             } else {
-                await createLanche(adminFormData);
+                await createLanche(dataToSend);
                 toast.success('Lanche criado com sucesso!');
             }
             setIsAdminModalOpen(false);
@@ -121,15 +124,23 @@ function Main() {
         }
     };
 
-    const handleAdminDelete = async (lanche) => {
-        if (window.confirm(`Tem certeza que deseja excluir permanentemente o lanche "${lanche.nome}"? Esta ação não pode ser desfeita.`)) {
-            try {
-                await deleteLanche(lanche.id);
-                toast.success('Lanche excluído com sucesso!');
-                fetchLanches();
-            } catch (err) {
-                toast.error('Erro ao excluir lanche.');
-            }
+    const handleAdminDelete = (lanche) => {
+        setLancheToDelete(lanche);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmAdminDelete = async () => {
+        if (!lancheToDelete) return;
+
+        try {
+            await deleteLanche(lancheToDelete.id, { userId: user.id });
+            toast.success('Lanche excluído com sucesso!');
+            fetchLanches();
+        } catch (err) {
+            toast.error(`Erro ao excluir lanche: ${err.message}`);
+        } finally {
+            setIsDeleteModalOpen(false);
+            setLancheToDelete(null);
         }
     };
 
@@ -159,7 +170,6 @@ function Main() {
                 )}
             </header>
 
-            {/* Barra de Pesquisa */}
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">🔍</span>
@@ -243,7 +253,6 @@ function Main() {
                 )}
             </div>
 
-            {/* Modal de Pedido (Cliente) */}
             <Modal 
                 isOpen={!!selectedLanche} 
                 onClose={() => { setSelectedLanche(null); setQuantidade(1); }}
@@ -289,7 +298,6 @@ function Main() {
                 )}
             </Modal>
 
-            {/* Modal de Gerenciamento (Admin) */}
             <Modal
                 isOpen={isAdminModalOpen}
                 onClose={() => setIsAdminModalOpen(false)}
@@ -351,8 +359,26 @@ function Main() {
                     </div>
                 </div>
             </Modal>
+
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmAdminDelete}
+                title="Confirmar Exclusão"
+                confirmText="Sim, Excluir"
+                cancelText="Não, Manter"
+            >
+                {lancheToDelete && (
+                    <p className="text-gray-600">
+                        Tem certeza que deseja excluir permanentemente o lanche <span className="font-bold">"{lancheToDelete.nome}"</span>? 
+                        <br />
+                        <span className="font-bold text-red-500">Esta ação não pode ser desfeita.</span>
+                    </p>
+                )}
+            </Modal>
         </div>
     );
 }
+
 
 export default Main;

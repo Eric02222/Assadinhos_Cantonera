@@ -35,8 +35,11 @@ function ListaHistorico() {
         switch (acao) {
             case 'Pedido': return 'bg-blue-100 text-blue-600';
             case 'Edição': return 'bg-yellow-100 text-yellow-600';
-            case 'Cancelamento/Exclusão': return 'bg-red-100 text-red-600';
+            case 'Cancelamento': return 'bg-red-100 text-red-600';
             case 'Entrega Realizada': return 'bg-green-100 text-green-600';
+            case 'Lanche Criado': return 'bg-green-100 text-green-600';
+            case 'Lanche Editado': return 'bg-yellow-100 text-yellow-600';
+            case 'Lanche Excluído': return 'bg-red-100 text-red-600';
             default: return 'bg-gray-100 text-gray-600';
         }
     };
@@ -54,8 +57,8 @@ function ListaHistorico() {
                     {user?.tipo_conta === 1 ? 'Histórico Geral de Ações' : 'Meu Histórico'}
                 </h1>
                 <p className="text-gray-500">
-                    {user?.tipo_conta === 1 
-                        ? 'Auditoria completa de todas as movimentações e ações realizadas no sistema.' 
+                    {user?.tipo_conta === 1
+                        ? 'Auditoria completa de todas as movimentações e ações realizadas no sistema.'
                         : 'Confira o registro de todas as suas interações e pedidos passados.'}
                 </p>
             </header>
@@ -67,7 +70,7 @@ function ListaHistorico() {
                             <tr>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Data/Hora</th>
                                 {user?.tipo_conta === 1 && (
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Usuário</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Usuário (Tipo)</th>
                                 )}
                                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Lanche</th>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Qtd</th>
@@ -77,19 +80,22 @@ function ListaHistorico() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {historico.length > 0 ? (
-                                historico.sort((a, b) => new Date(b.horarioPedido) - new Date(a.horarioPedido)).map((item) => (
+                                historico.map((item) => (
                                     <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4 text-gray-400 text-xs">
                                             {new Date(item.horarioPedido).toLocaleString('pt-BR')}
                                         </td>
                                         {user?.tipo_conta === 1 && (
-                                            <td className="px-6 py-4 font-bold text-gray-700">{item.usuarioNome}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-bold text-gray-700">{item.usuarioNome}</div>
+                                                <div className="text-[10px] text-gray-400 uppercase">{item.tipoConta}</div>
+                                            </td>
                                         )}
                                         <td className="px-6 py-4 font-bold text-gray-800">{item.lancheNome}</td>
                                         <td className="px-6 py-4 text-gray-600 font-medium">{item.quantidadePedida} un.</td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${getAcaoBadgeClass(item.acao)}`}>
-                                                {item.acao || 'Pedido'}
+                                                {item.acao}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 text-sm max-w-xs truncate" title={item.enderecoPedido}>
@@ -98,6 +104,7 @@ function ListaHistorico() {
                                     </tr>
                                 ))
                             ) : (
+
                                 <tr>
                                     <td colSpan={user?.tipo_conta === 1 ? 6 : 5} className="px-6 py-10 text-center text-gray-400">
                                         Nenhum registro encontrado no histórico.

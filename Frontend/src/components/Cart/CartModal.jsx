@@ -5,7 +5,7 @@ import { createPedido } from '../../services/pedido';
 import { toast } from 'react-toastify';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { cart, removeFromCart, updateCartQuantity, clearCart, user } = useAuth();
+  const { cart, removeFromCart, updateCartQuantity, clearCart, user, refreshInventory } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [endereco, setEndereco] = useState(user?.endereco || '');
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
@@ -24,7 +24,6 @@ const CartModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      // O backend cria um pedido por vez, então vamos iterar sobre o carrinho
       const promises = cart.map(item => {
         const pedidoData = {
           lanchePedido: item.id,
@@ -41,6 +40,7 @@ const CartModal = ({ isOpen, onClose }) => {
       if (allSuccess) {
         toast.success('Todos os pedidos foram realizados com sucesso!');
         clearCart();
+        refreshInventory(); 
         onClose();
         setIsCheckingOut(false);
         setIsPaymentConfirmed(false);

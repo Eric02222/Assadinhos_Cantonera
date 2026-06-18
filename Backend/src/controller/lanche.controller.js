@@ -2,7 +2,7 @@ import db from "../config/db.js";
 
 const createLanche = async (req, res) => {
     try {
-        const { nome, preco, categoria, quantidade } = req.body;
+        const { nome, preco, categoria, quantidade, userId } = req.body;
 
         if (!nome || preco === undefined || !categoria || quantidade === undefined) {
             return res.status(400).json({ message: "Todos os campos devem ser preenchidos", success: false });
@@ -18,6 +18,11 @@ const createLanche = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Não foi possível inserir o lanche", success: false });
         }
+
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, nomeLanche, quantidadePedida, usuarioComprador, acao) VALUES (NOW(), ?, ?, 0, ?, 'Lanche Criado')",
+            [result.insertId, nome, userId || 3]
+        );
 
         return res.status(201).json({ message: "Lanche cadastrado com sucesso", success: true });
     } catch (error) {
@@ -56,7 +61,7 @@ const getLanchesById = async (req, res) => {
 const editarLanche = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, preco, categoria, quantidade } = req.body;
+        const { nome, preco, categoria, quantidade, userId } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: "O ID do lanche é obrigatório.", success: false });
@@ -77,6 +82,11 @@ const editarLanche = async (req, res) => {
             return res.status(404).json({ message: "Lanche não encontrado ou nenhuma alteração foi feita.", success: false });
         }
 
+        await db.query(
+            "INSERT INTO historico (horarioPedido, lanchePedido, nomeLanche, quantidadePedida, usuarioComprador, acao) VALUES (NOW(), ?, ?, 0, ?, 'Lanche Editado')",
+            [id, nome, userId || 3]
+        );
+
         return res.status(200).json({ message: "Lanche atualizado com sucesso.", success: true });
     } catch (error) {
         console.error("Erro ao editar lanche:", error);
@@ -87,16 +97,28 @@ const editarLanche = async (req, res) => {
 const excluirLanche = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userId } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: "O ID do lanche é obrigatório.", success: false });
         }
+
+        const [lancheRows] = await db.query("SELECT nome FROM lanches WHERE id = ?", [id]);
+        const nomeLanche = lancheRows.length > 0 ? lancheRows[0].nome : 'Lanche Desconhecido';
+
+        await db.query("UPDATE historico SET lanchePedido = NULL WHERE lanchePedido = ?", [id]);
+        await db.query("UPDATE pedidos SET lanchePedido = NULL WHERE lanchePedido = ?", [id]);
 
         const [result] = await db.query("DELETE FROM lanches WHERE id = ?", [id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Lanche não encontrado.", success: false });
         }
+
+        await db.query(
+            "INSERT INTO historico (horarioPedido, nomeLanche, quantidadePedida, usuarioComprador, acao) VALUES (NOW(), ?, 0, ?, 'Lanche Excluído')",
+            [nomeLanche, userId || 3]
+        );
 
         return res.status(200).json({ message: "Lanche excluído com sucesso.", success: true });
     } catch (error) {

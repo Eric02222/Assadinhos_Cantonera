@@ -37,7 +37,6 @@ const createPedido = async (req, res) => {
             return res.status(400).json({ message: "Não foi possível realizar o pedido", success: false });
         }
 
-        // Log no histórico
         await db.query(
             "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
             [lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, 'Pedido']
@@ -117,7 +116,6 @@ const editarPedido = async (req, res) => {
             const lancheNovo = lancheNovoRows[0];
 
             if (quantidadePedida > lancheNovo.quantidade) {
-                 // Reverte a devolução se o novo não tiver estoque suficiente
                 await db.query("UPDATE lanches SET quantidade = quantidade - ?, disponivel = (quantidade > 0) WHERE id = ?", [pedidoAtual.quantidadePedida, pedidoAtual.lanchePedido]);
                 return res.status(400).json({ message: `Quantidade solicitada (${quantidadePedida}) maior que a disponível (${lancheNovo.quantidade})`, success: false });
             }
@@ -136,7 +134,6 @@ const editarPedido = async (req, res) => {
             return res.status(404).json({ message: "Pedido não encontrado ou nenhuma alteração foi feita.", success: false });
         }
 
-        // Log no histórico
         await db.query(
             "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
             [lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, 'Edição']
@@ -157,12 +154,13 @@ const excluirPedido = async (req, res) => {
             return res.status(400).json({ message: "O ID do pedido é obrigatório.", success: false });
         }
 
-        // Busca dados do pedido antes de excluir para o histórico
         const [pedidoRows] = await db.query("SELECT * FROM pedidos WHERE id = ?", [id]);
         if (pedidoRows.length === 0) {
             return res.status(404).json({ message: "Pedido não encontrado.", success: false });
         }
         const pedido = pedidoRows[0];
+
+        await db.query("UPDATE lanches SET quantidade = quantidade + ?, disponivel = true WHERE id = ?", [pedido.quantidadePedida, pedido.lanchePedido]);
 
         const [result] = await db.query("DELETE FROM pedidos WHERE id = ?", [id]);
 
@@ -170,13 +168,12 @@ const excluirPedido = async (req, res) => {
             return res.status(404).json({ message: "Pedido não encontrado.", success: false });
         }
 
-        // Log no histórico
         await db.query(
             "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
-            [pedido.lanchePedido, pedido.quantidadePedida, pedido.enderecoPedido, pedido.usuarioComprador, 'Cancelamento/Exclusão']
+            [pedido.lanchePedido, pedido.quantidadePedida, pedido.enderecoPedido, pedido.usuarioComprador, 'Cancelamento']
         );
 
-        return res.status(200).json({ message: "Pedido excluído com sucesso.", success: true });
+        return res.status(200).json({ message: "Pedido excluído com sucesso e estoque atualizado.", success: true });
     } catch (error) {
         console.error("Erro ao excluir pedido:", error);
         return res.status(500).json({ message: "Erro interno ao excluir pedido.", error: error.message });
@@ -191,7 +188,6 @@ const confirmarEntrega = async (req, res) => {
             return res.status(400).json({ message: "O ID do pedido é obrigatório.", success: false });
         }
 
-        // Busca dados do pedido antes de excluir para o histórico
         const [pedidoRows] = await db.query("SELECT * FROM pedidos WHERE id = ?", [id]);
         if (pedidoRows.length === 0) {
             return res.status(404).json({ message: "Pedido não encontrado.", success: false });
@@ -204,7 +200,6 @@ const confirmarEntrega = async (req, res) => {
             return res.status(404).json({ message: "Pedido não encontrado.", success: false });
         }
 
-        // Log no histórico
         await db.query(
             "INSERT INTO historico (horarioPedido, lanchePedido, quantidadePedida, enderecoPedido, usuarioComprador, acao) VALUES (NOW(), ?, ?, ?, ?, ?)",
             [pedido.lanchePedido, pedido.quantidadePedida, pedido.enderecoPedido, pedido.usuarioComprador, 'Entrega Realizada']

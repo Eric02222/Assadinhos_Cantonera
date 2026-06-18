@@ -1,10 +1,16 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
+  const [lastOrderTime, setLastOrderTime] = useState(Date.now());
+
+  const refreshInventory = () => {
+    setLastOrderTime(Date.now());
+  };
 
   useEffect(() => {
     const carregarDadosArmazenados = () => {
@@ -39,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    alert("Voce saiu de sua conta");
+    toast.success('Usuario deslogado com sucesso!');
     localStorage.removeItem("user");
     setUser(null);
   };
@@ -85,16 +91,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      setUser, 
-      login, 
-      logout, 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      updateCartQuantity, 
-      clearCart 
+    <AuthContext.Provider value={{
+      user,
+      setUser,
+      login,
+      logout,
+      cart,
+      addToCart,
+      removeFromCart,
+      updateCartQuantity,
+      clearCart,
+      lastOrderTime,
+      refreshInventory
     }}>
       {children}
     </AuthContext.Provider>

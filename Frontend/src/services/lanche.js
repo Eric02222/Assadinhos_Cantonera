@@ -40,9 +40,9 @@ export async function updateLanche(id, data) {
     }
 }
 
-export async function deleteLanche(id) {
+export async function deleteLanche(id, data) {
     try {
-        const res = await api.delete(`/lanche/${id}`);
+        const res = await api.delete(`/lanche/${id}`, { data });
         return res.data;
     } catch (error) {
         console.error('Erro ao excluir lanche', error);

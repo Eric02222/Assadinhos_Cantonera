@@ -27,10 +27,12 @@ const createHistorico = async (req, res) => {
 const getHistorico = async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT h.*, l.nome as lancheNome, u.nome as usuarioNome 
+            SELECT h.*, COALESCE(h.nomeLanche, l.nome, 'Lanche Excluído') as lancheNome, u.nome as usuarioNome, 
+                   CASE WHEN u.tipo_conta = 1 THEN 'Admin' ELSE 'Cliente' END as tipoConta
             FROM historico h 
-            JOIN lanches l ON h.lanchePedido = l.id 
+            LEFT JOIN lanches l ON h.lanchePedido = l.id 
             JOIN usuarios u ON h.usuarioComprador = u.id
+            ORDER BY h.horarioPedido DESC
         `);
         return res.status(200).json({ success: true, data: rows });
     } catch (error) {
