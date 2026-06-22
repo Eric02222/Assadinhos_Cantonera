@@ -60,7 +60,7 @@ function CadastroForm() {
 
             const data = await cadastrarUser(submissionData);
             if (data.success) {
-                alert('Cadastro realizado com sucesso!');
+                toast.success('Cadastro realizado com sucesso!');
                 navigate('/login');
             } else {
                 setError(data.message || 'Erro ao realizar cadastro');
