@@ -53,11 +53,14 @@ function LoginForm() {
 
             if (data.success) {
                 login(data.usuario);
+                toast.success('Login realizado com sucesso!');
                 navigate('/');
             } else {
+                toast.error('Erro ao Realizar Login!');
                 setError(data.message || 'Erro ao realizar login');
             }
         } catch (err) {
+            toast.error('Erro ao Realizar Login!');
             setError('Falha na conexão com o servidor');
         }
     };
