@@ -11,6 +11,7 @@ import Layout from './layout/Layout.jsx'
 import { AuthProvider } from './context/Context.jsx'
 import Historico from './pages/Historico/Historico.jsx'
 import Pedidos from './pages/Pedidos/Pedidos.jsx'
+import RecuperarSenha from './pages/RecuperarSenha/RecuperarSenha.jsx'
 
 
 const router = createBrowserRouter([
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "/cadastro", element: <Cadastro /> },
       { path: "/historico", element: <Historico /> },
       { path: "/pedidos", element: <Pedidos /> },
+      { path: "/esqueceuSenha", element: <RecuperarSenha/> },
       { path: "*", element: <Error /> }
     ]
   }

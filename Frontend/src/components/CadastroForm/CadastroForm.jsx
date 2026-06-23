@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { cadastrarUser } from '../../services/auth';
+import { Link, useNavigate } from "react-router"
+import { toast } from 'react-toastify';
 
 function CadastroForm() {
     const [formData, setFormData] = useState({
@@ -34,10 +35,10 @@ function CadastroForm() {
 
     const handleChange = (e) => {
         let { name, value } = e.target;
-        
+
         if (name === 'cpf') value = maskCPF(value);
         if (name === 'telefone') value = maskTelefone(value);
-        
+
         setFormData({ ...formData, [name]: value });
     };
 
@@ -49,6 +50,13 @@ function CadastroForm() {
             setError('As senhas não coincidem');
             return;
         }
+
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/;
+
+        if (!regex.test(formData.senha) || !regex.test(formData.confirmarSenha)) {
+            setError('A senha deve conter 6 a 12 caracteres, uma letra maiúscula e minuscula, número e caractere especial');
+            return;
+        };
 
         try {
             const submissionData = {
@@ -66,63 +74,63 @@ function CadastroForm() {
                 setError(data.message || 'Erro ao realizar cadastro');
             }
         } catch (err) {
-            setError('Falha na conexão com o servidor');
+            console.log('Falha na conexão com o servidor', err);
         }
     };
 
     return (
         <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
             <h2 className="mb-6 text-gray-800 text-center text-2xl font-bold">Criar Conta</h2>
-            
+
             {error && (
                 <div className="bg-red-100 text-red-600 p-3 rounded-md mb-5 text-sm text-center">
                     {error}
                 </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block mb-1 font-semibold text-gray-600 text-sm">Nome Completo</label>
-                    <input 
+                    <input
                         name="nome"
-                        type="text" 
-                        placeholder="Seu nome" 
+                        type="text"
+                        placeholder="Seu nome"
                         className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                         onChange={handleChange}
-                        required 
+                        required
                     />
                 </div>
                 <div>
                     <label className="block mb-1 font-semibold text-gray-600 text-sm">E-mail</label>
-                    <input 
+                    <input
                         name="email"
-                        type="email" 
-                        placeholder="Seu e-mail" 
+                        type="email"
+                        placeholder="Seu e-mail"
                         className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                         onChange={handleChange}
-                        required 
+                        required
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block mb-1 font-semibold text-gray-600 text-sm">CPF</label>
-                        <input 
+                        <input
                             name="cpf"
-                            type="text" 
+                            type="text"
                             value={formData.cpf}
-                            placeholder="000.000.000-00" 
+                            placeholder="000.000.000-00"
                             className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                             onChange={handleChange}
-                            required 
+                            required
                         />
                     </div>
                     <div>
                         <label className="block mb-1 font-semibold text-gray-600 text-sm">Telefone</label>
-                        <input 
+                        <input
                             name="telefone"
-                            type="text" 
+                            type="text"
                             value={formData.telefone}
-                            placeholder="(00) 00000-0000" 
+                            placeholder="(00) 00000-0000"
                             className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                             onChange={handleChange}
                         />
@@ -131,33 +139,33 @@ function CadastroForm() {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block mb-1 font-semibold text-gray-600 text-sm">Senha</label>
-                        <input 
+                        <input
                             name="senha"
-                            type="password" 
-                            placeholder="Sua senha" 
+                            type="password"
+                            placeholder="Sua senha"
                             className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                             onChange={handleChange}
-                            required 
+                            required
                         />
                     </div>
                     <div>
                         <label className="block mb-1 font-semibold text-gray-600 text-sm">Confirmar Senha</label>
-                        <input 
+                        <input
                             name="confirmarSenha"
-                            type="password" 
-                            placeholder="Repita a senha" 
+                            type="password"
+                            placeholder="Repita a senha"
                             className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                             onChange={handleChange}
-                            required 
+                            required
                         />
                     </div>
                 </div>
                 <div>
                     <label className="block mb-1 font-semibold text-gray-600 text-sm">Endereço</label>
-                    <input 
+                    <input
                         name="endereco"
-                        type="text" 
-                        placeholder="Seu endereço" 
+                        type="text"
+                        placeholder="Seu endereço"
                         className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
                         onChange={handleChange}
                     />
@@ -166,7 +174,7 @@ function CadastroForm() {
                     Cadastrar
                 </button>
             </form>
-            
+
             <div className="mt-6 text-center text-sm text-gray-500">
                 Já tem uma conta? <Link to="/login" className="text-red-500 font-semibold hover:underline">Entrar</Link>
             </div>

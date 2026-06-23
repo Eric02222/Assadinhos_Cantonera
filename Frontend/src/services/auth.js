@@ -30,3 +30,13 @@ export async function loginUserCpf(data) {
         throw error
     }
 }
+
+export async function esqueciSenha(data) {
+    try {
+        const res = await api.post('/login/esqueciSenha', data);
+        return res.data;
+    } catch (error) {
+        console.log('Erro ao recuperar senha', error)
+    }
+
+}

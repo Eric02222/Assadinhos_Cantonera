@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUserEmail, loginUserCpf } from '../../services/auth';
 import { useAuth } from '../../context/Context';
+import { toast } from 'react-toastify';
 
 function LoginForm() {
     const [loginType, setLoginType] = useState('email'); // 'email' or 'cpf'
@@ -122,8 +123,12 @@ function LoginForm() {
                 </button>
             </form>
             
-            <div className="mt-6 text-center text-sm text-gray-500 border-b border-gray-100 pb-6">
+            <div className="mt-6 text-center text-sm text-gray-500 ">
                 Não tem uma conta? <Link to="/cadastro" className="text-red-500 font-semibold hover:underline">Cadastre-se</Link>
+            </div>
+
+            <div className="mt-2 text-center text-sm text-gray-500 border-b border-gray-100 pb-6">
+                Esqueceu Sua Senha? <Link to="/esqueceuSenha" className="text-red-500 font-semibold hover:underline">Recuperar</Link>
             </div>
 
             {/* Demonstração */}

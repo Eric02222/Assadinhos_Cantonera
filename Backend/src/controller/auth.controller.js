@@ -13,6 +13,15 @@ export const novoUsuario = async (req, res) => {
                 message: "Campos obrigatórios: nome, email, senha e cpf."
             });
         }
+        if (senha === "") {
+            return res.status(400).json({ message: "O campo confirmar senha é obrigatório. Não deve estar vazio.", success: false })
+        } else {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/;
+
+            if (!regex.test(senha)) {
+                return res.status(400).json({ message: "A senha não corresponde as regras impostas para uma senha forte", success: false })
+            };
+        };
 
         const hashedPassword = await bcrypt.hash(senha, saltRounds);
 
@@ -120,6 +129,67 @@ export const loginUsuarioCpf = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Erro ao logar usuário.",
+            error: error.message
+        });
+    }
+}
+
+export const esqueciSenha = async (req, res) => {
+    try {
+        const email = req.body.email
+        const senha = req.body.novaSenha
+        const confirmar_senha = req.body.confirmarSenha
+
+
+        if (email === "") {
+            return res.status(400).json({ message: "Email não deve estar vazio. Ele é obrigatório.", success: false })
+        }
+
+        if (senha === "") {
+            return res.status(400).json({ message: "Senha não deve estar vazio. Ela é obrigatório.", success: false })
+        } else {
+            if (senha.length < 6 || senha.length > 12) {
+                return res.status(400).json({ message: "A senha deve somente de 6 a 12 caracteres.", success: false })
+
+            };
+        };
+
+        if (confirmar_senha === "") {
+            return res.status(400).json({ message: "O campo confirmar senha é obrigatório. Não deve estar vazio.", success: false })
+        } else {
+            if (confirmar_senha !== senha) {
+                return res.status(400).json({ message: "O campo confirmar senha não é igual a senha. Tente novamente.", success: false })
+            };
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/;
+
+            if (!regex.test(senha)) {
+                return res.status(400).json({ message: "A senha não corresponde as regras impostas para uma senha forte", success: false })
+            };
+        };
+
+        const [row] = await db.query("SELECT id FROM usuarios WHERE email = ?", [email]);
+
+        if (row.length === 0) {
+            return res.status(400).json({ message: "Esse ussuário não foi encontrado", success: false })
+        }
+
+        const user = row[0];
+
+        const saltRound = 10;
+        const hashPassword = await bcrypt.hash(senha, saltRound) 
+
+        const [result] = await db.query("UPDATE usuarios SET senha = ? WHERE id = ?", [hashPassword, user.id])
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Não foi possivel resetar a sua senha. Tente novamente.", success: false })
+        }
+
+        return res.status(201).json({ message: "Senha atualizada com sucesso", success: true })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Erro ao recuperar senha.",
             error: error.message
         });
     }
