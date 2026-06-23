@@ -12,6 +12,8 @@ import { AuthProvider } from './context/Context.jsx'
 import Historico from './pages/Historico/Historico.jsx'
 import Pedidos from './pages/Pedidos/Pedidos.jsx'
 import RecuperarSenha from './pages/RecuperarSenha/RecuperarSenha.jsx'
+import ListaUsuarios from './pages/ListaUsuarios/ListaUsuarios.jsx'
+import Perfil from './pages/Perfil/Perfil.jsx'
 
 
 const router = createBrowserRouter([
@@ -23,7 +25,9 @@ const router = createBrowserRouter([
       { path: "/cadastro", element: <Cadastro /> },
       { path: "/historico", element: <Historico /> },
       { path: "/pedidos", element: <Pedidos /> },
-      { path: "/esqueceuSenha", element: <RecuperarSenha/> },
+      { path: "/esqueceuSenha", element: <RecuperarSenha /> },
+      { path: "/listaUsuarios", element: <ListaUsuarios /> },
+      { path: "/perfil", element: <Perfil /> },
       { path: "*", element: <Error /> }
     ]
   }

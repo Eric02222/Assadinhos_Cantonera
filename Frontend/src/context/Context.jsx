@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [lastOrderTime, setLastOrderTime] = useState(Date.now());
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   const refreshInventory = () => {
     setLastOrderTime(Date.now());
@@ -38,6 +39,15 @@ export const AuthProvider = ({ children }) => {
     };
     carregarDadosArmazenados();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
 
   const login = (userData) => {
     localStorage.setItem("user", JSON.stringify(userData));
@@ -102,7 +112,9 @@ export const AuthProvider = ({ children }) => {
       updateCartQuantity,
       clearCart,
       lastOrderTime,
-      refreshInventory
+      refreshInventory,
+      theme,
+      toggleTheme
     }}>
       {children}
     </AuthContext.Provider>

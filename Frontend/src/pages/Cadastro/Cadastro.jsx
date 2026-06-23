@@ -3,7 +3,7 @@ import CadastroForm from '../../components/CadastroForm/CadastroForm';
 
 function Cadastro() {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100 p-5">
+        <div className="flex justify-center items-center h-[calc(100vh-80px)] p-5">
             <CadastroForm />
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cadastrarUser } from '../../services/auth';
 import { Link, useNavigate } from "react-router"
 import { toast } from 'react-toastify';
@@ -15,6 +15,13 @@ function CadastroForm() {
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, []);
 
     const maskCPF = (value) => {
         return value
@@ -79,105 +86,108 @@ function CadastroForm() {
     };
 
     return (
-        <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
-            <h2 className="mb-6 text-gray-800 text-center text-2xl font-bold">Criar Conta</h2>
+        <div className="bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg w-full max-w-md transition-colors duration-300">
+            <h2 className="mb-6 text-gray-800 dark:text-gray-100 text-center text-2xl font-bold">Criar Conta</h2>
 
             {error && (
-                <div className="bg-red-100 text-red-600 p-3 rounded-md mb-5 text-sm text-center">
+                <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-md mb-5 text-sm text-center">
                     {error}
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block mb-1 font-semibold text-gray-600 text-sm">Nome Completo</label>
+                    <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Nome Completo</label>
                     <input
                         name="nome"
                         type="text"
                         placeholder="Seu nome"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                        className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                         onChange={handleChange}
                         required
                     />
                 </div>
                 <div>
-                    <label className="block mb-1 font-semibold text-gray-600 text-sm">E-mail</label>
+                    <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">E-mail</label>
                     <input
                         name="email"
                         type="email"
                         placeholder="Seu e-mail"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                        className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                         onChange={handleChange}
                         required
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block mb-1 font-semibold text-gray-600 text-sm">CPF</label>
+                        <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">CPF</label>
                         <input
                             name="cpf"
                             type="text"
                             value={formData.cpf}
                             placeholder="000.000.000-00"
-                            className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                            className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block mb-1 font-semibold text-gray-600 text-sm">Telefone</label>
+                        <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Telefone</label>
                         <input
                             name="telefone"
                             type="text"
                             value={formData.telefone}
                             placeholder="(00) 00000-0000"
-                            className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                            className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                             onChange={handleChange}
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block mb-1 font-semibold text-gray-600 text-sm">Senha</label>
+                        <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Senha</label>
                         <input
                             name="senha"
                             type="password"
                             placeholder="Sua senha"
-                            className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                            className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block mb-1 font-semibold text-gray-600 text-sm">Confirmar Senha</label>
+                        <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Confirmar Senha</label>
                         <input
                             name="confirmarSenha"
                             type="password"
                             placeholder="Repita a senha"
-                            className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                            className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                             onChange={handleChange}
                             required
                         />
                     </div>
                 </div>
                 <div>
-                    <label className="block mb-1 font-semibold text-gray-600 text-sm">Endereço</label>
+                    <label className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Endereço</label>
                     <input
                         name="endereco"
                         type="text"
                         placeholder="Seu endereço"
-                        className="w-full p-2.5 border border-gray-300 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors"
+                        className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                         onChange={handleChange}
                     />
                 </div>
+
+                <div className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400 border-b border-t border-gray-100 dark:border-gray-800 pb-6 pt-6">
+                    Já tem uma conta? <Link to="/login" className="text-red-500 font-semibold hover:underline">Entrar</Link>
+                </div>
+
                 <button type="submit" className="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors mt-2 shadow-md">
                     Cadastrar
                 </button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-gray-500">
-                Já tem uma conta? <Link to="/login" className="text-red-500 font-semibold hover:underline">Entrar</Link>
-            </div>
+
         </div>
     );
 }

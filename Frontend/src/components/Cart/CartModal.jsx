@@ -56,23 +56,23 @@ const CartModal = ({ isOpen, onClose }) => {
   const renderCartItems = () => (
     <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
       {cart.length === 0 ? (
-        <p className="text-center text-gray-500 py-4">Seu carrinho está vazio.</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 py-4">Seu carrinho está vazio.</p>
       ) : (
         cart.map((item) => (
-          <div key={item.id} className="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
+          <div key={item.id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl transition-colors">
             <div className="flex-1">
-              <h4 className="font-bold text-gray-800">{item.nome}</h4>
-              <p className="text-sm text-gray-500">R$ {parseFloat(item.preco).toFixed(2)} un.</p>
+              <h4 className="font-bold text-gray-800 dark:text-gray-100">{item.nome}</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">R$ {parseFloat(item.preco).toFixed(2)} un.</p>
             </div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => updateCartQuantity(item.id, Math.max(1, item.quantidadeNoCarrinho - 1))}
-                className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50"
+                className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50 dark:hover:bg-red-900/20"
               >-</button>
-              <span className="font-bold w-4 text-center">{item.quantidadeNoCarrinho}</span>
+              <span className="font-bold w-4 text-center dark:text-gray-200">{item.quantidadeNoCarrinho}</span>
               <button 
                 onClick={() => updateCartQuantity(item.id, item.quantidadeNoCarrinho + 1)}
-                className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50"
+                className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50 dark:hover:bg-red-900/20"
               >+</button>
               <button 
                 onClick={() => removeFromCart(item.id)}
@@ -85,8 +85,8 @@ const CartModal = ({ isOpen, onClose }) => {
         ))
       )}
       {cart.length > 0 && (
-        <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-          <span className="text-gray-500 font-bold uppercase text-xs">Total</span>
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <span className="text-gray-500 dark:text-gray-400 font-bold uppercase text-xs">Total</span>
           <span className="text-2xl font-black text-green-500">R$ {total.toFixed(2)}</span>
         </div>
       )}
@@ -96,9 +96,9 @@ const CartModal = ({ isOpen, onClose }) => {
   const renderCheckoutForm = () => (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-bold text-gray-600 mb-2">Endereço de Entrega:</label>
+        <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2">Endereço de Entrega:</label>
         <textarea 
-          className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-100 outline-none transition-all text-gray-700 font-medium"
+          className="w-full p-4 bg-gray-50 dark:bg-gray-800 border-none rounded-2xl focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 outline-none transition-all text-gray-700 dark:text-gray-200 font-medium"
           rows="3"
           placeholder="Digite o endereço completo para entrega..."
           value={endereco}
@@ -106,7 +106,7 @@ const CartModal = ({ isOpen, onClose }) => {
         ></textarea>
       </div>
 
-      <div className="bg-red-50 p-4 rounded-2xl flex items-start gap-3">
+      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl flex items-start gap-3 transition-colors">
         <input 
           type="checkbox" 
           id="confirmPayment" 
@@ -114,7 +114,7 @@ const CartModal = ({ isOpen, onClose }) => {
           checked={isPaymentConfirmed}
           onChange={(e) => setIsPaymentConfirmed(e.target.checked)}
         />
-        <label htmlFor="confirmPayment" className="text-sm text-gray-700 leading-tight cursor-pointer">
+        <label htmlFor="confirmPayment" className="text-sm text-gray-700 dark:text-gray-300 leading-tight cursor-pointer">
           Confirmo que desejo realizar o pagamento de <strong>R$ {total.toFixed(2)}</strong> na entrega (Dinheiro ou Cartão).
         </label>
       </div>
