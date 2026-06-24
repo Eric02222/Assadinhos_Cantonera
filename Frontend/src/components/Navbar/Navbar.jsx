@@ -7,32 +7,44 @@ import { FaUser } from "react-icons/fa";
 import { FaMoon } from "react-icons/fa";
 import CartModal from "../Cart/CartModal";
 
+/**
+ * Componente Navbar
+ * Barra de navegação principal da aplicação.
+ * Gerencia a exibição de links, menus de usuário, alternância de tema e o carrinho de compras.
+ */
 function Navbar() {
+  // Contexto para dados do usuário, carrinho e tema
   const { user, logout, cart, theme, toggleTheme } = useAuth();
+  
+  // Estados para controlar a visibilidade de modais e menus
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Calcula total de itens no carrinho
   const cartItemsCount = cart.reduce((acc, item) => acc + item.quantidadeNoCarrinho, 0);
 
+  // Links de navegação baseados no estado de autenticação e tipo de usuário
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Histórico", path: "/historico" },
+    ...(user ? [{ name: "Histórico", path: "/historico" }] : []),
     ...(user?.tipo_conta === 0 ? [{ name: "Pedidos", path: "/pedidos" }] : []),
-    ...(user?.tipo_conta === 1 ? [{name: "Lista Usuários", path: "/listaUsuarios"}] : []),
+    ...(user?.tipo_conta === 1 ? [{ name: "Lista Usuários", path: "/listaUsuarios" }] : []),
   ];
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-40 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
+          
+          {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-black text-red-500 tracking-tighter">
               ASSADINHOS <span className="text-gray-800 dark:text-gray-100">CANTONERA</span>
             </Link>
           </div>
 
-          {/* Desktop Menu */}
+          {/* Menu Desktop */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -44,6 +56,7 @@ function Navbar() {
               </Link>
             ))}
 
+            {/* Ações do usuário logado ou botões de entrada */}
             {user ? (
               <div className="flex items-center gap-6">
                 {user?.tipo_conta === 0 && (
@@ -51,7 +64,6 @@ function Navbar() {
                     onClick={() => setIsCartOpen(true)}
                     className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors flex items-center gap-1.5"
                   >
-                    {/* Substituído o emoji pelo ícone AiOutlineShoppingCart */}
                     <span className="font-semibold flex items-center gap-1.5">
                       Carrinho <AiOutlineShoppingCart className="text-xl" />
                     </span>
@@ -63,6 +75,7 @@ function Navbar() {
                   </button>
                 )}
 
+                {/* Dropdown de usuário */}
                 <div className="relative flex items-center gap-4 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -81,7 +94,6 @@ function Navbar() {
                         onClick={() => { setIsUserMenuOpen(false); setIsMobileMenuOpen(false); }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                       >
-                        {/* Adicionado o ícone FaUser */}
                         <FaUser className="text-gray-400" /> Perfil
                       </Link>
                       <hr className="my-1 border-gray-100 dark:border-gray-700" />
@@ -89,7 +101,6 @@ function Navbar() {
                         onClick={toggleTheme}
                         className="w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                       >
-                        {/* Substituídos os emojis pelos ícones FaMoon e MdWbSunny */}
                         {theme === "light" ? (
                           <>
                             <FaMoon className="text-gray-400" /> Modo Escuro
@@ -112,6 +123,7 @@ function Navbar() {
                 </div>
               </div>
             ) : (
+              // Botões para usuários não logados
               <div className="flex items-center gap-4">
                 <Link to="/login" className="text-gray-600 dark:text-gray-300 font-semibold hover:text-red-500 transition-colors px-4">Login</Link>
                 <Link
@@ -124,7 +136,7 @@ function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Botão de menu mobile */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
@@ -138,7 +150,7 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Menu Drawer Mobile */}
       <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
         <div className={`absolute right-0 top-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -152,6 +164,7 @@ function Navbar() {
               </button>
             </div>
 
+            {/* Links no menu mobile */}
             <div className="flex flex-col gap-4 mb-8">
               {navLinks.map((link) => (
                 <Link
@@ -168,7 +181,6 @@ function Navbar() {
                   onClick={() => { setIsCartOpen(true); setIsMobileMenuOpen(false); }}
                   className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-left flex items-center justify-between w-full"
                 >
-                  {/* Substituído o emoji do carrinho no mobile */}
                   <span className="flex items-center gap-2">
                     Carrinho <AiOutlineShoppingCart className="text-xl" />
                   </span>
@@ -177,6 +189,7 @@ function Navbar() {
               )}
             </div>
 
+            {/* Ações do usuário no menu mobile */}
             <div className="mt-auto border-t border-gray-100 dark:border-gray-800 pt-6">
               {user ? (
                 <div className="flex flex-col gap-4">
@@ -188,7 +201,6 @@ function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-gray-100 dark:border-gray-800"
                   >
-                    {/* Adicionado o ícone FaUser no mobile */}
                     <FaUser /> Perfil
                   </Link>
                   <button
@@ -196,7 +208,6 @@ function Navbar() {
                     className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold transition-colors"
                   >
                     <span>Modo Alternar</span>
-                    {/* Substituídos os emojis do tema no mobile */}
                     {theme === "light" ? (
                       <span className="flex items-center gap-1.5 text-sm font-normal"><FaMoon /> Escuro</span>
                     ) : (

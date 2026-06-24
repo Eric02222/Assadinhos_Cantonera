@@ -18,7 +18,10 @@ import Perfil from './pages/Perfil/Perfil.jsx'
 
 const router = createBrowserRouter([
   {
-    element: <Layout />,
+    element:
+      <AuthProvider>
+        <Layout />
+      </AuthProvider>,
     children: [
       { path: "/", element: <Home /> },
       { path: "/login", element: <Login /> },
@@ -35,15 +38,14 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <ToastContainer
-        autoClose={4000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable
-        pauseOnHover={false} />
-    </AuthProvider>
+
+    <RouterProvider router={router} />
+    <ToastContainer
+      autoClose={4000}
+      hideProgressBar={false}
+      closeOnClick
+      pauseOnFocusLoss={false}
+      draggable
+      pauseOnHover={false} />
   </StrictMode>,
 )

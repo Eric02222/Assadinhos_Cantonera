@@ -4,7 +4,13 @@ import { useAuth } from '../../context/Context';
 import Modal from '../Modal/Modal';
 import { toast } from 'react-toastify';
 
+/**
+ * Componente ListaPedidos
+ * Responsável por listar os pedidos realizados.
+ * Permite editar, cancelar ou confirmar a entrega de um pedido.
+ */
 function ListaPedidos() {
+    // Estados para gerenciar a lista de pedidos, carregamento e modais de ação
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,22 +23,24 @@ function ListaPedidos() {
     });
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [pedidoToCancel, setPedidoToCancel] = useState(null);
-    const { user } = useAuth();
+    const { user } = useAuth(); // Contexto de autenticação
 
+    // Busca pedidos ao carregar o componente ou alterar o usuário
     useEffect(() => {
         fetchPedidos();
     }, [user]);
 
+    // Busca todos os pedidos e filtra de acordo com o tipo de conta do usuário
     const fetchPedidos = async () => {
         try {
             const data = await getPedidos();
             if (data.success) {
 
                 if (user?.tipo_conta === 1) {
-                    setPedidos(data.data);
+                    setPedidos(data.data); // Admin vê todos
                 } else {
                     const seusPedidos = data.data.filter(p => p.usuarioComprador === user?.id);
-                    setPedidos(seusPedidos);
+                    setPedidos(seusPedidos); // Cliente vê apenas os próprios
                 }
             }
         } catch (err) {
@@ -43,6 +51,7 @@ function ListaPedidos() {
         }
     };
 
+    // Abre modal de edição preenchido com dados do pedido
     const handleOpenModal = (pedido) => {
         setEditingPedido(pedido);
         setFormData({
@@ -54,17 +63,19 @@ function ListaPedidos() {
         setIsModalOpen(true);
     };
 
+    // Gerencia mudanças no formulário de edição
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Salva a edição do pedido via API
     const handleSave = async () => {
         try {
             const res = await updatePedido(editingPedido.id, formData);
             if (res.success) {
                 toast.success('Pedido atualizado com sucesso!');
                 setIsModalOpen(false);
-                fetchPedidos();
+                fetchPedidos(); // Atualiza a lista após salvar
             } else {
                 toast.error(res.message || 'Erro ao atualizar pedido.');
             }
@@ -73,18 +84,20 @@ function ListaPedidos() {
         }
     };
 
+    // Abre modal de confirmação para cancelamento
     const handleDelete = (pedido) => {
         setPedidoToCancel(pedido);
         setIsCancelModalOpen(true);
     };
 
+    // Confirma e processa o cancelamento via API
     const confirmDelete = async () => {
         if (!pedidoToCancel) return;
         try {
             const res = await deletePedido(pedidoToCancel.id);
             if (res.success) {
                 toast.success('Pedido cancelado com sucesso!');
-                fetchPedidos();
+                fetchPedidos(); // Atualiza a lista após cancelar
             } else {
                 toast.error(res.message || 'Erro ao cancelar pedido.');
             }
@@ -96,12 +109,13 @@ function ListaPedidos() {
         }
     };
 
+    // Confirma entrega do pedido via API
     const handleConfirmarEntrega = async (id) => {
         try {
             const res = await confirmarEntrega(id);
             if (res.success) {
                 toast.success('Entrega confirmada!');
-                fetchPedidos();
+                fetchPedidos(); // Atualiza a lista após confirmação
             } else {
                 toast.error(res.message || 'Erro ao confirmar entrega.');
             }
@@ -110,6 +124,7 @@ function ListaPedidos() {
         }
     };
 
+    // Exibe loading durante a busca
     if (loading) return (
         <div className="text-center py-20 text-gray-500 animate-pulse font-medium">
             Carregando pedidos...
@@ -118,6 +133,7 @@ function ListaPedidos() {
 
     return (
         <div className="space-y-6 transition-colors duration-300">
+            {/* Cabeçalho dinâmico baseado no usuário */}
             <header className="mb-8">
                 <h1 className="text-3xl font-black text-gray-800 dark:text-gray-100">
                     {user?.tipo_conta === 1 ? 'Gerenciamento de Pedidos' : 'Meus Pedidos'}
@@ -129,6 +145,7 @@ function ListaPedidos() {
                 </p>
             </header>
 
+            {/* Tabela de pedidos */}
             <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -194,6 +211,7 @@ function ListaPedidos() {
                 </div>
             </div>
 
+            {/* Modal de Edição */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -227,7 +245,7 @@ function ListaPedidos() {
                 </div>
             </Modal>
 
-            {/* Modal de Confirmação de Cancelamento */}
+            {/* Modal de Cancelamento */}
             <Modal
                 isOpen={isCancelModalOpen}
                 onClose={() => setIsCancelModalOpen(false)}

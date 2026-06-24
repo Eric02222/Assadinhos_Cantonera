@@ -4,14 +4,24 @@ import { loginUserEmail, loginUserCpf } from '../../services/auth';
 import { useAuth } from '../../context/Context';
 import { toast } from 'react-toastify';
 
+/**
+ * Componente LoginForm
+ * Responsável por renderizar o formulário de login do usuário,
+ * permitindo acesso via E-mail ou CPF, e realizar a autenticação via API.
+ */
 function LoginForm() {
-    const [loginType, setLoginType] = useState('email'); // 'email' or 'cpf'
+    // Estado para definir o modo de login (email ou cpf)
+    const [loginType, setLoginType] = useState('email'); 
+    // Estados para os campos do formulário
     const [identifier, setIdentifier] = useState('');
     const [senha, setSenha] = useState('');
+    // Estado para mensagens de erro de autenticação
     const [error, setError] = useState('');
+    
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login } = useAuth(); // Contexto de autenticação
 
+    // Efeito para evitar scroll na página durante a exibição do formulário
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
@@ -19,6 +29,7 @@ function LoginForm() {
         };
     }, []);
 
+    // Aplica máscara de formatação para CPF
     const maskCPF = (value) => {
         return value
             .replace(/\D/g, '')
@@ -28,6 +39,7 @@ function LoginForm() {
             .replace(/(-\d{2})\d+?$/, '$1');
     };
 
+    // Gerencia mudanças no identificador (email ou CPF com máscara)
     const handleIdentifierChange = (e) => {
         let value = e.target.value;
         if (loginType === 'cpf') {
@@ -36,6 +48,7 @@ function LoginForm() {
         setIdentifier(value);
     };
 
+    // Preenche campos com credenciais de demonstração
     const handleDemoLogin = (type) => {
         setLoginType('email');
         if (type === 'admin') {
@@ -47,11 +60,13 @@ function LoginForm() {
         }
     };
 
+    // Processa a submissão do formulário de login
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         try {
             let data;
+            // Realiza login via E-mail ou CPF
             if (loginType === 'email') {
                 data = await loginUserEmail({ email: identifier, senha });
             } else {
@@ -59,6 +74,7 @@ function LoginForm() {
                 data = await loginUserCpf({ cpf: cpfOnlyNumbers, senha });
             }
 
+            // Se sucesso, atualiza o contexto e redireciona
             if (data.success) {
                 login(data.usuario);
                 toast.success('Login realizado com sucesso!');
@@ -77,6 +93,7 @@ function LoginForm() {
         <div className="bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg w-full max-w-md transition-colors duration-300 ">
             <h2 className="mb-6 text-gray-800 dark:text-gray-100 text-center text-2xl font-bold">Entrar no Assadinhos</h2>
 
+            {/* Alternância entre modo de login: E-mail ou CPF */}
             <div className="flex mb-6 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
                 <button
                     type="button"
@@ -94,6 +111,7 @@ function LoginForm() {
                 </button>
             </div>
 
+            {/* Exibição de mensagens de erro */}
             {error && (
                 <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-md mb-5 text-sm text-center">
                     {error}
@@ -126,6 +144,7 @@ function LoginForm() {
                     />
                 </div>
 
+                {/* Links para cadastro e recuperação de senha */}
                 <div className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-6">
                     Não tem uma conta? <Link to="/cadastro" className="text-red-500 font-semibold hover:underline">Cadastre-se</Link>
                 </div>
@@ -139,6 +158,7 @@ function LoginForm() {
                 </button>
             </form>
 
+            {/* Acesso para demonstração */}
             <div className="mt-6">
                 <p className="text-xs text-center text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-4">Acesso para Demonstração</p>
                 <div className="grid grid-cols-2 gap-3">

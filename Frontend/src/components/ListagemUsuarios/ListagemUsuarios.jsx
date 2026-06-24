@@ -4,7 +4,13 @@ import { useAuth } from '../../context/Context';
 import Modal from '../Modal/Modal';
 import { toast } from 'react-toastify';
 
+/**
+ * Componente ListagemUsuarios
+ * Responsável por exibir uma tabela com todos os usuários cadastrados no sistema,
+ * permitindo que administradores editem ou excluam contas de usuários.
+ */
 function ListagemUsuarios() {
+    // Estados para armazenar dados da lista, carregamento e modais
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,14 +24,16 @@ function ListagemUsuarios() {
     });
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [usuarioToDelete, setUsuarioToDelete] = useState(null);
-    const { user } = useAuth();
+    const { user } = useAuth(); // Verifica o usuário logado para controle de acesso
 
+    // Carrega usuários ao montar o componente, apenas se for admin
     useEffect(() => {
         if (user?.tipo_conta === 1) {
             fetchUsuarios();
         }
     }, [user]);
 
+    // Busca lista de usuários na API
     const fetchUsuarios = async () => {
         try {
             const res = await getUsuarios();
@@ -42,6 +50,7 @@ function ListagemUsuarios() {
         }
     };
 
+    // Abre o modal de edição e preenche o formulário com dados do usuário
     const handleOpenModal = (usuario) => {
         setEditingUsuario(usuario);
         setFormData({
@@ -54,17 +63,19 @@ function ListagemUsuarios() {
         setIsModalOpen(true);
     };
 
+    // Atualiza o estado conforme o usuário digita no formulário
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Salva as alterações do usuário no backend
     const handleSave = async () => {
         try {
             const res = await updateUsuario(editingUsuario.id, formData);
             if (res.success) {
                 toast.success('Usuário atualizado com sucesso!');
                 setIsModalOpen(false);
-                fetchUsuarios();
+                fetchUsuarios(); // Atualiza a lista
             } else {
                 toast.error(res.message || 'Erro ao atualizar usuário.');
             }
@@ -73,18 +84,20 @@ function ListagemUsuarios() {
         }
     };
 
+    // Abre modal de confirmação para exclusão
     const handleDeleteClick = (usuario) => {
         setUsuarioToDelete(usuario);
         setIsDeleteModalOpen(true);
     };
 
+    // Executa a exclusão do usuário após confirmação
     const confirmDelete = async () => {
         if (!usuarioToDelete) return;
         try {
             const res = await deleteUsuario(usuarioToDelete.id);
             if (res.success) {
                 toast.success('Usuário excluído com sucesso!');
-                fetchUsuarios();
+                fetchUsuarios(); // Atualiza a lista
             } else {
                 toast.error(res.message || 'Erro ao excluir usuário.');
             }
@@ -96,6 +109,7 @@ function ListagemUsuarios() {
         }
     };
 
+    // Proteção de rota: exibe mensagem se não for admin
     if (user?.tipo_conta !== 1) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -107,6 +121,7 @@ function ListagemUsuarios() {
         );
     }
 
+    // Exibe loading enquanto busca dados
     if (loading) return (
         <div className="text-center py-20 text-gray-500 animate-pulse font-medium">
             Carregando usuários...
@@ -124,6 +139,7 @@ function ListagemUsuarios() {
                 </p>
             </header>
 
+            {/* Tabela de listagem */}
             <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -178,6 +194,7 @@ function ListagemUsuarios() {
                 </div>
             </div>
 
+            {/* Modal de Edição */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -246,6 +263,7 @@ function ListagemUsuarios() {
                 </div>
             </Modal>
 
+            {/* Modal de Exclusão */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

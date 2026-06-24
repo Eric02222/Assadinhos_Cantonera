@@ -3,16 +3,22 @@ import { esqueciSenha } from "../../services/auth.js";
 import { Link, useNavigate } from "react-router"
 import { toast } from 'react-toastify';
 
-
+/**
+ * Componente RecuperarSenhaForm
+ * Permite que o usuário redefina sua senha através do e-mail cadastrado.
+ */
 function RecuperarSenhaForm() {
+    // Estado para armazenar dados do formulário (e-mail e senhas)
     const [form, setForm] = useState({
         email: '',
         novaSenha: '',
         confirmarSenha: ''
     })
+    // Estado para mensagens de erro
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Efeito para impedir scroll na página ao exibir o formulário
     useEffect(() => {
             document.body.style.overflow = 'hidden';
             return () => {
@@ -20,14 +26,18 @@ function RecuperarSenhaForm() {
             };
         }, []);
 
+    // Processa a redefinição de senha
     const handleChangePassword = async (e) => {
         e.preventDefault();
         setError('');
+
+        // Valida se as senhas coincidem
         if (form.novaSenha !== form.confirmarSenha) {
             setError('As senhas não coincidem');
             return;
         }
 
+        // Validação de complexidade de senha (regex)
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/;
 
         if (!regex.test(form.novaSenha) || !regex.test(form.confirmarSenha)) {
@@ -36,6 +46,7 @@ function RecuperarSenhaForm() {
         };
 
         try {
+            // Chama serviço de recuperação de senha
             const ok = await esqueciSenha(form);
             console.log(ok)
             if (ok.success) {
@@ -55,21 +66,25 @@ function RecuperarSenhaForm() {
 
             <form onSubmit={handleChangePassword} className="space-y-4">
 
+                {/* Campo de e-mail */}
                 <div>
-                    <label htmlFor="senhaRegistro" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Email</label>
+                    <label htmlFor="email" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Email</label>
                     <input type="email" id='email' className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder='Digite seu Email' required />
                 </div>
 
+                {/* Campo de nova senha */}
                 <div>
-                    <label htmlFor="senhaRegistro" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Nova Senha</label>
+                    <label htmlFor="senha_nova" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Nova Senha</label>
                     <input type="password" id='senha_nova' className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" value={form.novaSenha} onChange={(e) => setForm({ ...form, novaSenha: e.target.value })} placeholder='Nova Senha' required />
                 </div>
 
+                {/* Campo de confirmação de senha */}
                 <div>
-                    <label htmlFor="senhaRegistro" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Confirmar Senha</label>
+                    <label htmlFor="confirmar_senha" className="block mb-1 font-semibold text-gray-600 dark:text-gray-400 text-sm">Confirmar Senha</label>
                     <input type="password" id='confirmar_senha' className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-base focus:border-red-500 focus:outline-none transition-colors bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" value={form.confirmarSenha} onChange={(e) => setForm({ ...form, confirmarSenha: e.target.value })} placeholder='Confirmar Senha' required />
                 </div>
 
+                {/* Exibição de erros */}
                 {error && (
                     <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-md mb-5 text-sm text-center">
                         {error}

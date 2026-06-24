@@ -4,14 +4,26 @@ import Modal from '../Modal/Modal';
 import { createPedido } from '../../services/pedido';
 import { toast } from 'react-toastify';
 
+/**
+ * Componente CartModal
+ * Exibe o carrinho de compras do usuário dentro de um modal.
+ * Permite gerenciar itens (aumentar/diminuir/remover) e finalizar o pedido.
+ */
 const CartModal = ({ isOpen, onClose }) => {
+  // Contexto para manipulação do carrinho e dados do usuário
   const { cart, removeFromCart, updateCartQuantity, clearCart, user, refreshInventory } = useAuth();
+  
+  // Estado para alternar entre visualização do carrinho e formulário de finalização
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  
+  // Estado para armazenar o endereço e confirmação de pagamento
   const [endereco, setEndereco] = useState(user?.endereco || '');
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
 
+  // Cálculo do total do carrinho
   const total = cart.reduce((acc, item) => acc + item.preco * item.quantidadeNoCarrinho, 0);
 
+  // Lógica de finalização do pedido
   const handleCheckout = async () => {
     if (!endereco) {
       toast.warning('Por favor, informe o endereço de entrega.');
@@ -24,6 +36,7 @@ const CartModal = ({ isOpen, onClose }) => {
     }
 
     try {
+      // Cria uma promessa para cada item do carrinho
       const promises = cart.map(item => {
         const pedidoData = {
           lanchePedido: item.id,
@@ -34,13 +47,14 @@ const CartModal = ({ isOpen, onClose }) => {
         return createPedido(pedidoData);
       });
 
+      // Aguarda o processamento de todos os pedidos
       const results = await Promise.all(promises);
       const allSuccess = results.every(res => res.success);
 
       if (allSuccess) {
         toast.success('Todos os pedidos foram realizados com sucesso!');
         clearCart();
-        refreshInventory(); 
+        refreshInventory(); // Atualiza inventário após pedido
         onClose();
         setIsCheckingOut(false);
         setIsPaymentConfirmed(false);
@@ -53,6 +67,7 @@ const CartModal = ({ isOpen, onClose }) => {
     }
   };
 
+  // Renderiza a lista de itens no carrinho
   const renderCartItems = () => (
     <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
       {cart.length === 0 ? (
@@ -65,6 +80,7 @@ const CartModal = ({ isOpen, onClose }) => {
               <p className="text-sm text-gray-500 dark:text-gray-400">R$ {parseFloat(item.preco).toFixed(2)} un.</p>
             </div>
             <div className="flex items-center gap-3">
+              {/* Botões para ajustar quantidade */}
               <button 
                 onClick={() => updateCartQuantity(item.id, Math.max(1, item.quantidadeNoCarrinho - 1))}
                 className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -74,6 +90,7 @@ const CartModal = ({ isOpen, onClose }) => {
                 onClick={() => updateCartQuantity(item.id, item.quantidadeNoCarrinho + 1)}
                 className="w-8 h-8 rounded-full border border-red-500 text-red-500 flex justify-center items-center font-bold hover:bg-red-50 dark:hover:bg-red-900/20"
               >+</button>
+              {/* Botão para remover item */}
               <button 
                 onClick={() => removeFromCart(item.id)}
                 className="ml-2 text-gray-400 hover:text-red-500 transition-colors"
@@ -84,6 +101,7 @@ const CartModal = ({ isOpen, onClose }) => {
           </div>
         ))
       )}
+      {/* Exibe total se houver itens */}
       {cart.length > 0 && (
         <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <span className="text-gray-500 dark:text-gray-400 font-bold uppercase text-xs">Total</span>
@@ -93,6 +111,7 @@ const CartModal = ({ isOpen, onClose }) => {
     </div>
   );
 
+  // Renderiza formulário de checkout
   const renderCheckoutForm = () => (
     <div className="space-y-6">
       <div>
@@ -106,6 +125,7 @@ const CartModal = ({ isOpen, onClose }) => {
         ></textarea>
       </div>
 
+      {/* Confirmação de pagamento */}
       <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl flex items-start gap-3 transition-colors">
         <input 
           type="checkbox" 

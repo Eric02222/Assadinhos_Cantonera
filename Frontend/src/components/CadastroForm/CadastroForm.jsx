@@ -3,7 +3,13 @@ import { cadastrarUser } from '../../services/auth';
 import { Link, useNavigate } from "react-router"
 import { toast } from 'react-toastify';
 
+/**
+ * Componente CadastroForm
+ * Responsável por renderizar o formulário de registro de novos usuários,
+ * validar os dados inseridos e realizar a chamada para o serviço de autenticação.
+ */
 function CadastroForm() {
+    // Estado para armazenar os dados do formulário
     const [formData, setFormData] = useState({
         nome: '',
         email: '',
@@ -13,9 +19,11 @@ function CadastroForm() {
         endereco: '',
         telefone: ''
     });
+    // Estado para gerenciar mensagens de erro
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Efeito para evitar scroll na página durante a exibição do formulário (efeito de modal)
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
@@ -23,6 +31,7 @@ function CadastroForm() {
         };
     }, []);
 
+    // Aplica máscara de formatação para CPF
     const maskCPF = (value) => {
         return value
             .replace(/\D/g, '')
@@ -32,6 +41,7 @@ function CadastroForm() {
             .replace(/(-\d{2})\d+?$/, '$1');
     };
 
+    // Aplica máscara de formatação para Telefone
     const maskTelefone = (value) => {
         return value
             .replace(/\D/g, '')
@@ -40,6 +50,7 @@ function CadastroForm() {
             .replace(/(-\d{4})\d+?$/, '$1');
     };
 
+    // Gerencia mudanças nos campos do formulário e aplica máscaras
     const handleChange = (e) => {
         let { name, value } = e.target;
 
@@ -49,15 +60,18 @@ function CadastroForm() {
         setFormData({ ...formData, [name]: value });
     };
 
+    // Processa o envio do formulário, valida senhas e chama a API de cadastro
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
+        // Validação de senhas iguais
         if (formData.senha !== formData.confirmarSenha) {
             setError('As senhas não coincidem');
             return;
         }
 
+        // Validação de complexidade de senha usando regex
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,12}$/;
 
         if (!regex.test(formData.senha) || !regex.test(formData.confirmarSenha)) {
@@ -66,6 +80,7 @@ function CadastroForm() {
         };
 
         try {
+            // Limpa máscaras antes de enviar ao backend
             const submissionData = {
                 ...formData,
                 cpf: formData.cpf.replace(/\D/g, ''),
@@ -73,6 +88,7 @@ function CadastroForm() {
             };
             delete submissionData.confirmarSenha;
 
+            // Chama serviço de cadastro
             const data = await cadastrarUser(submissionData);
             if (data.success) {
                 toast.success('Cadastro realizado com sucesso!');
@@ -89,6 +105,7 @@ function CadastroForm() {
         <div className="bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg w-full max-w-md transition-colors duration-300">
             <h2 className="mb-6 text-gray-800 dark:text-gray-100 text-center text-2xl font-bold">Criar Conta</h2>
 
+            {/* Exibição de erros de validação */}
             {error && (
                 <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-md mb-5 text-sm text-center">
                     {error}
@@ -186,8 +203,6 @@ function CadastroForm() {
                     Cadastrar
                 </button>
             </form>
-
-
         </div>
     );
 }

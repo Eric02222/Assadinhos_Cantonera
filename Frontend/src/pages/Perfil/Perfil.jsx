@@ -1,12 +1,11 @@
-import React from 'react'
-import PaginaPerfil from '../../components/PaginaPerfil/PaginaPerfil'
+import PaginaPerfil from '../../components/PaginaPerfil/PaginaPerfil';
 
 function Perfil() {
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8 md:py-12 transition-colors duration-300">
       <PaginaPerfil />
     </div>
-  )
+  );
 }
 
-export default Perfil
+export default Perfil;

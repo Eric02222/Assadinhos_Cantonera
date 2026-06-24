@@ -45,6 +45,7 @@ create table historico(
     enderecoPedido varchar(255),
     usuarioComprador int,
     nomeLanche VARCHAR(255),
+    nomeCliente VARCHAR(255),
     acao varchar(50),
     foreign key (lanchePedido) references lanches(id),
     foreign key (usuarioComprador) references usuarios(id)

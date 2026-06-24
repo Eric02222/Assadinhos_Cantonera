@@ -4,17 +4,27 @@ import { useAuth } from '../../context/Context';
 import Modal from '../Modal/Modal';
 import { toast } from 'react-toastify';
 
+/**
+ * Componente Main
+ * Exibe a vitrine de produtos (lanches), permitindo aos usuários buscar/filtrar produtos 
+ * e adicioná-los ao carrinho. Administradores possuem funções extras de CRUD (cadastrar, editar, excluir).
+ */
 function Main() {
+    // Estados para listagem e filtragem de produtos
     const [lanches, setLanches] = useState([]);
     const [filteredLanches, setFilteredLanches] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     
+    // Estados para gerenciamento de compra (seleção e quantidade)
     const [selectedLanche, setSelectedLanche] = useState(null);
     const [quantidade, setQuantidade] = useState(1);
+    
+    // Estado de carregamento e contexto de usuário/carrinho
     const [loading, setLoading] = useState(true);
     const { user, addToCart, lastOrderTime } = useAuth();
 
+    // Estados para modais de administrador (CRUD de lanches)
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
     const [editingLanche, setEditingLanche] = useState(null);
     const [adminFormData, setAdminFormData] = useState({
@@ -24,17 +34,21 @@ function Main() {
         quantidade: ''
     });
 
+    // Estados para modal de confirmação de exclusão
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [lancheToDelete, setLancheToDelete] = useState(null);
 
+    // Carrega lanches ao montar ou quando há atualização no histórico de pedidos
     useEffect(() => {
         fetchLanches();
     }, [lastOrderTime]); 
 
+    // Filtra lanches sempre que o termo de busca, categoria ou a lista de lanches mudar
     useEffect(() => {
         filterLanches();
     }, [searchTerm, categoryFilter, lanches]);
 
+    // Busca lista de lanches na API
     const fetchLanches = async () => {
         try {
             const data = await getLanches();
@@ -49,6 +63,7 @@ function Main() {
         }
     };
 
+    // Filtra lanches com base no termo de busca e categoria
     const filterLanches = () => {
         let result = lanches;
 
@@ -67,6 +82,7 @@ function Main() {
         setFilteredLanches(result);
     };
 
+    // Adiciona lanche ao carrinho do contexto
     const handleAddToCart = () => {
         if (!user) {
             toast.warning('Você precisa estar logado para adicionar ao carrinho.');
@@ -79,6 +95,7 @@ function Main() {
         setQuantidade(1);
     };
 
+    // Abre o modal administrativo para cadastrar ou editar um lanche
     const handleOpenAdminModal = (lanche = null) => {
         if (lanche) {
             setEditingLanche(lanche);
@@ -100,6 +117,7 @@ function Main() {
         setIsAdminModalOpen(true);
     };
 
+    // Salva ou atualiza um lanche (CRUD administrativo)
     const handleAdminSave = async () => {
         if (!adminFormData.nome || !adminFormData.preco || !adminFormData.categoria || adminFormData.quantidade === '') {
             toast.warning('Preencha todos os campos corretamente.');
@@ -116,24 +134,26 @@ function Main() {
                 toast.success('Lanche criado com sucesso!');
             }
             setIsAdminModalOpen(false);
-            fetchLanches();
+            fetchLanches(); // Atualiza lista
         } catch (err) {
             toast.error('Erro ao salvar lanche.');
         }
     };
 
+    // Abre modal para confirmar exclusão
     const handleAdminDelete = (lanche) => {
         setLancheToDelete(lanche);
         setIsDeleteModalOpen(true);
     };
 
+    // Confirma exclusão via API
     const confirmAdminDelete = async () => {
         if (!lancheToDelete) return;
 
         try {
             await deleteLanche(lancheToDelete.id, { userId: user.id });
             toast.success('Lanche excluído com sucesso!');
-            fetchLanches();
+            fetchLanches(); // Atualiza lista
         } catch (err) {
             toast.error(`Erro ao excluir lanche: ${err.message}`);
         } finally {
@@ -142,6 +162,7 @@ function Main() {
         }
     };
 
+    // Exibe loading
     if (loading) return (
         <div className="flex justify-center items-center py-20">
             <div className="text-xl font-semibold text-gray-600 dark:text-gray-400 animate-pulse">Carregando cardápio...</div>
@@ -152,6 +173,7 @@ function Main() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-10 transition-colors duration-300">
+            {/* Header com título e botão de admin */}
             <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
                 <div className="text-center md:text-left">
                     <h1 className="text-5xl font-extrabold text-red-500 mb-2 tracking-tight">Assadinhos Cantonera</h1>
@@ -168,6 +190,7 @@ function Main() {
                 )}
             </header>
 
+            {/* Filtros de busca e categoria */}
             <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 mb-12 flex flex-col md:flex-row gap-4 transition-colors">
                 <div className="flex-1 relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xl">🔍</span>
@@ -194,6 +217,7 @@ function Main() {
                 </div>
             </div>
 
+            {/* Grid de Lanches */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {filteredLanches.length > 0 ? (
                     filteredLanches.map((lanche) => (
@@ -251,6 +275,7 @@ function Main() {
                 )}
             </div>
 
+            {/* Modal para Adicionar ao Carrinho */}
             <Modal 
                 isOpen={!!selectedLanche} 
                 onClose={() => { setSelectedLanche(null); setQuantidade(1); }}
@@ -296,6 +321,7 @@ function Main() {
                 )}
             </Modal>
 
+            {/* Modal Administrativo (Adicionar/Editar Lanche) */}
             <Modal
                 isOpen={isAdminModalOpen}
                 onClose={() => setIsAdminModalOpen(false)}
@@ -358,6 +384,7 @@ function Main() {
                 </div>
             </Modal>
 
+            {/* Modal de confirmação de exclusão */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
